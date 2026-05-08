@@ -68,7 +68,7 @@ export default function EventDetailPage() {
   const isConfirmed = app?.status === 'confirmed';
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: '#fdf6ee' }}>
+    <div className="min-h-screen pb-40" style={{ background: '#fdf6ee' }}>
       {/* 헤더 이미지 */}
       <div className="relative h-56" style={{ background: 'linear-gradient(135deg, #c9956a 0%, #7b4f2e 100%)' }}>
         {event.thumbnail
@@ -179,8 +179,8 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-6 pt-3"
+      {/* 신청 버튼 - 네비바 위 */}
+      <div className="fixed bottom-[60px] left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-3 pt-3"
         style={{ background: 'linear-gradient(transparent, #fdf6ee 40%)' }}>
         {canApply && (
           <button onClick={handleApply} disabled={applying}
@@ -201,6 +201,23 @@ export default function EventDetailPage() {
             style={{ background: '#f2e4cc', color: '#7b5a2a' }}>신청이 마감됐습니다</div>
         )}
       </div>
+
+      {/* 하단 네비 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
+        {[
+          { icon: '🏠', label: '홈', path: '/home' },
+          { icon: '☕', label: '이벤트', path: '/events', active: true },
+          { icon: '👤', label: '마이', path: '/my' },
+        ].map(n => (
+          <button key={n.label} onClick={() => navigate(n.path)}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium"
+            style={{ color: n.active ? '#4a2c17' : '#a07850' }}>
+            <span className="text-xl">{n.icon}</span>
+            <span>{n.label}</span>
+          </button>
+        ))}
+      </nav>
 
       <Toast msg={toast} />
     </div>

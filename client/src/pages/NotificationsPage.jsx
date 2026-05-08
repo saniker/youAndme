@@ -32,7 +32,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen pb-10" style={{ background: '#fdf6ee' }}>
+    <div className="min-h-screen pb-24" style={{ background: '#fdf6ee' }}>
       <div className="sticky top-0 z-50 px-5 py-4 border-b flex items-center gap-3"
         style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
         <button onClick={() => navigate(-1)} className="text-xl" style={{ color: '#7b4f2e' }}>←</button>
@@ -65,6 +65,23 @@ export default function NotificationsPage() {
           ))}
         </div>
       )}
+
+      {/* 하단 네비 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
+        {[
+          { icon: '🏠', label: '홈', path: '/home' },
+          { icon: '☕', label: '이벤트', path: '/events' },
+          { icon: '👤', label: '마이', path: '/my' },
+        ].map(n => (
+          <button key={n.label} onClick={() => navigate(n.path)}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium"
+            style={{ color: '#a07850' }}>
+            <span className="text-xl">{n.icon}</span>
+            <span>{n.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
