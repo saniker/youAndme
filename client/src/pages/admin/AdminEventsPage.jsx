@@ -97,10 +97,10 @@ export default function AdminEventsPage() {
 
       {/* 이벤트 생성 모달 */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}
+        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)', paddingBottom: 60 }}
           onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
           <div className="w-full max-w-[430px] mx-auto rounded-t-3xl flex flex-col"
-            style={{ background: '#fffdf9', maxHeight: '90vh' }}>
+            style={{ background: '#fffdf9', maxHeight: 'calc(90vh - 60px)' }}>
             {/* 헤더 - 고정 */}
             <div className="px-5 pt-5 pb-3 flex-shrink-0" style={{ borderBottom: '1px solid #e8d5b7' }}>
               <h3 className="font-semibold" style={{ color: '#4a2c17' }}>새 이벤트 만들기</h3>
