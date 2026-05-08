@@ -25,23 +25,34 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/admin', require('./routes/admin'));
 
-// 파일 업로드
+// 파일 업로드 (Supabase Storage)
 const multer = require('multer');
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`);
-  }
-});
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
-
-app.post('/api/upload', upload.single('photo'), (req, res) => {
+app.post('/api/upload', upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: '파일 없음' });
-  res.json({ url: `/uploads/${req.file.filename}` });
+  try {
+    const supabase = require('./db');
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
+
+    const { error } = await supabase.storage
+      .from('photos')
+      .upload(filename, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false,
+      });
+
+    if (error) return res.status(500).json({ error: error.message });
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('photos')
+      .getPublicUrl(filename);
+
+    res.json({ url: publicUrl });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // 관리자 계정 초기화
