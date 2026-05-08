@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { useAuthStore } from '../../store';
@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
       style={{ background: 'linear-gradient(180deg, #4a2c17 0%, #7b4f2e 100%)' }}>
       <div className="text-5xl mb-4">🛠</div>
       <h1 className="text-2xl font-semibold text-white mb-1" style={{ fontFamily: "'Playfair Display',serif" }}>운영자 로그인</h1>
-      <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>YouAndMe 운영자 전용</p>
+      <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>너랑나랑 운영자 전용</p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-sm">
         <div className="rounded-2xl p-5 mb-4" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>

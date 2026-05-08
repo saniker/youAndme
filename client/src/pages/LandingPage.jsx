@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store';
 
@@ -26,7 +26,7 @@ export default function LandingPage() {
         ☕
       </div>
       <h1 className="text-5xl mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#4a2c17', letterSpacing: '2px' }}>
-        YouAndMe
+        너랑나랑
       </h1>
       <p className="text-xs tracking-widest mb-10" style={{ color: '#a07850' }}>ROTATION DATING</p>
 

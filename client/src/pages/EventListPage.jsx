@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store';
@@ -50,7 +50,7 @@ export default function EventListPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-xl font-semibold" style={{ fontFamily: "'Playfair Display',serif", color: '#4a2c17' }}>
-              ☕ YouAndMe
+              ☕ 너랑나랑
             </h1>
             <p className="text-xs" style={{ color: '#a07850' }}>{user?.name}님, 안녕하세요</p>
           </div>

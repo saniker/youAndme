@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+﻿import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import api from '../api';
@@ -91,7 +91,7 @@ export default function EventPage() {
       {/* 헤더 */}
       <div className="sticky top-0 z-50 px-5 py-3 border-b" style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
         <div className="flex items-center justify-between">
-          <span className="font-semibold" style={{ fontFamily: "'Playfair Display',serif", color: '#4a2c17' }}>YouAndMe</span>
+          <span className="font-semibold" style={{ fontFamily: "'Playfair Display',serif", color: '#4a2c17' }}>너랑나랑</span>
           <div className="flex items-center gap-2">
             <span className="text-xs px-3 py-1 rounded-full" style={{ background: '#f2e4cc', color: '#7b4f2e' }}>
               테이블 {tableNo}번

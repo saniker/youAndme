@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store';
@@ -58,7 +58,7 @@ export default function WaitingPage() {
       {/* 헤더 */}
       <div className="sticky top-0 z-50 flex items-center justify-between px-5 py-4 border-b"
         style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
-        <span className="font-semibold" style={{ fontFamily: "'Playfair Display',serif", color: '#4a2c17', fontSize: 18 }}>YouAndMe</span>
+        <span className="font-semibold" style={{ fontFamily: "'Playfair Display',serif", color: '#4a2c17', fontSize: 18 }}>너랑나랑</span>
         <button onClick={handleLogout} className="text-xs px-3 py-1.5 rounded-full border"
           style={{ borderColor: '#c9956a', color: '#7b4f2e' }}>로그아웃</button>
       </div>

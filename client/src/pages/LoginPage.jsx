@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store';
@@ -48,7 +48,7 @@ export default function LoginPage() {
         <h2 className="text-2xl font-semibold mb-1" style={{ fontFamily: "'Playfair Display', serif", color: '#4a2c17' }}>
           반갑습니다
         </h2>
-        <p className="text-sm mb-10" style={{ color: '#a07850' }}>YouAndMe에 오신 걸 환영해요</p>
+        <p className="text-sm mb-10" style={{ color: '#a07850' }}>너랑나랑에 오신 걸 환영해요</p>
 
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
           <div className="rounded-2xl p-5 mb-4" style={{ background: '#fffdf9', boxShadow: '0 4px 20px rgba(74,44,23,0.1)' }}>
