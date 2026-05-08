@@ -47,18 +47,24 @@ app.post('/api/upload', upload.single('photo'), (req, res) => {
 // 관리자 계정 초기화
 async function initAdmin() {
   const supabase = require('./db');
-  const { data: admin } = await supabase
-    .from('users').select('id').eq('email', 'admin@youandme.kr').single();
+  const { data: admin, error: findErr } = await supabase
+    .from('users').select('id').eq('email', 'admin@youandme.kr').maybeSingle();
+
+  if (findErr) console.error('initAdmin 조회 오류:', findErr.message);
 
   if (!admin) {
     const hash = bcrypt.hashSync('admin1234', 10);
-    await supabase.from('users').insert({
-      name: '관리자', gender: 'M', age: 30,
+    const { error: insertErr } = await supabase.from('users').insert({
+      name: '관리자', gender: 'M', age: 30, job: '', intro: '',
       email: 'admin@youandme.kr', password: hash, status: 'approved'
     });
-    console.log('✅ 관리자 계정 생성: admin@youandme.kr / admin1234');
+    if (insertErr) console.error('❌ 관리자 계정 생성 실패:', insertErr.message);
+    else console.log('✅ 관리자 계정 생성: admin@youandme.kr / admin1234');
   } else {
-    await supabase.from('users').update({ status: 'approved' }).eq('email', 'admin@youandme.kr');
+    const { error: updateErr } = await supabase.from('users')
+      .update({ status: 'approved' }).eq('email', 'admin@youandme.kr');
+    if (updateErr) console.error('❌ 관리자 상태 업데이트 실패:', updateErr.message);
+    else console.log('✅ 관리자 계정 확인됨');
   }
 }
 
