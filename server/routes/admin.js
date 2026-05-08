@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const supabase = require('../db');
 const { JWT_SECRET } = require('./auth');
 
 const router = express.Router();
@@ -19,241 +19,274 @@ function requireAdmin(req, res, next) {
 // ── 이벤트 관리 ──
 
 // 이벤트 생성
-router.post('/events', requireAdmin, (req, res) => {
-  const { title, region, cafeName, cafeAddress, date, time, capacityM, capacityF, description, thumbnail } = req.body;
-  if (!title || !region || !cafeName || !date)
-    return res.status(400).json({ error: '필수 항목 누락' });
+router.post('/events', requireAdmin, async (req, res) => {
+  try {
+    const { title, region, cafeName, cafeAddress, date, time, capacityM, capacityF, description, thumbnail } = req.body;
+    if (!title || !region || !cafeName || !date)
+      return res.status(400).json({ error: '필수 항목 누락' });
 
-  const result = db.prepare(`
-    INSERT INTO events (title,region,cafe_name,cafe_address,date,time,capacity_m,capacity_f,description,thumbnail)
-    VALUES (?,?,?,?,?,?,?,?,?,?)
-  `).run(title, region, cafeName, cafeAddress||'', date, time||'18:00',
-         capacityM||10, capacityF||10, description||'', thumbnail||'');
+    const { data, error } = await supabase.from('events').insert({
+      title, region, cafe_name: cafeName, cafe_address: cafeAddress||'',
+      date, time: time||'18:00', capacity_m: capacityM||10, capacity_f: capacityF||10,
+      description: description||'', thumbnail: thumbnail||''
+    }).select().single();
 
-  res.json(db.prepare('SELECT * FROM events WHERE id=?').get(result.lastInsertRowid));
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 이벤트 목록
-router.get('/events', requireAdmin, (req, res) => {
-  const events = db.prepare(`
-    SELECT e.*,
-      (SELECT COUNT(*) FROM applications WHERE event_id=e.id AND status='pending') as pending_count,
-      (SELECT COUNT(*) FROM applications a JOIN users u ON u.id=a.user_id
-        WHERE a.event_id=e.id AND a.status='confirmed' AND u.gender='M') as confirmed_m,
-      (SELECT COUNT(*) FROM applications a JOIN users u ON u.id=a.user_id
-        WHERE a.event_id=e.id AND a.status='confirmed' AND u.gender='F') as confirmed_f
-    FROM events e ORDER BY e.date DESC
-  `).all();
-  res.json(events);
+router.get('/events', requireAdmin, async (req, res) => {
+  try {
+    const { data: events } = await supabase.from('events').select('*').order('date', { ascending: false });
+    if (!events || events.length === 0) return res.json([]);
+
+    const { data: apps } = await supabase
+      .from('applications')
+      .select('event_id, status, users(gender)')
+      .in('event_id', events.map(e => e.id));
+
+    const enriched = events.map(ev => {
+      const evApps = (apps || []).filter(a => a.event_id === ev.id);
+      return {
+        ...ev,
+        pending_count: evApps.filter(a => a.status === 'pending').length,
+        confirmed_m: evApps.filter(a => a.status === 'confirmed' && a.users?.gender === 'M').length,
+        confirmed_f: evApps.filter(a => a.status === 'confirmed' && a.users?.gender === 'F').length,
+      };
+    });
+    res.json(enriched);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 이벤트 수정
-router.patch('/events/:id', requireAdmin, (req, res) => {
-  const { title, region, cafeName, cafeAddress, date, time, capacityM, capacityF, description, thumbnail, status } = req.body;
-  const ev = db.prepare('SELECT * FROM events WHERE id=?').get(req.params.id);
-  if (!ev) return res.status(404).json({ error: '없음' });
+router.patch('/events/:id', requireAdmin, async (req, res) => {
+  try {
+    const { title, region, cafeName, cafeAddress, date, time, capacityM, capacityF, description, thumbnail, status } = req.body;
+    const updates = {};
+    if (title !== undefined) updates.title = title;
+    if (region !== undefined) updates.region = region;
+    if (cafeName !== undefined) updates.cafe_name = cafeName;
+    if (cafeAddress !== undefined) updates.cafe_address = cafeAddress;
+    if (date !== undefined) updates.date = date;
+    if (time !== undefined) updates.time = time;
+    if (capacityM !== undefined) updates.capacity_m = capacityM;
+    if (capacityF !== undefined) updates.capacity_f = capacityF;
+    if (description !== undefined) updates.description = description;
+    if (thumbnail !== undefined) updates.thumbnail = thumbnail;
+    if (status !== undefined) updates.status = status;
 
-  db.prepare(`UPDATE events SET
-    title=COALESCE(?,title), region=COALESCE(?,region), cafe_name=COALESCE(?,cafe_name),
-    cafe_address=COALESCE(?,cafe_address), date=COALESCE(?,date), time=COALESCE(?,time),
-    capacity_m=COALESCE(?,capacity_m), capacity_f=COALESCE(?,capacity_f),
-    description=COALESCE(?,description), thumbnail=COALESCE(?,thumbnail), status=COALESCE(?,status)
-    WHERE id=?
-  `).run(title,region,cafeName,cafeAddress,date,time,capacityM,capacityF,description,thumbnail,status, req.params.id);
-
-  res.json(db.prepare('SELECT * FROM events WHERE id=?').get(req.params.id));
+    const { data, error } = await supabase.from('events').update(updates).eq('id', req.params.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 이벤트 삭제
-router.delete('/events/:id', requireAdmin, (req, res) => {
-  const event = db.prepare('SELECT * FROM events WHERE id=?').get(req.params.id);
-  if (!event) return res.status(404).json({ error: '없음' });
-  if (event.status === 'active') return res.status(400).json({ error: '진행 중인 이벤트는 삭제할 수 없습니다.' });
+router.delete('/events/:id', requireAdmin, async (req, res) => {
+  try {
+    const { data: event } = await supabase.from('events').select('*').eq('id', req.params.id).single();
+    if (!event) return res.status(404).json({ error: '없음' });
 
-  db.transaction(() => {
-    db.prepare('DELETE FROM likes WHERE event_id=?').run(req.params.id);
-    db.prepare('DELETE FROM matches WHERE event_id=?').run(req.params.id);
-    db.prepare('DELETE FROM applications WHERE event_id=?').run(req.params.id);
-    db.prepare('DELETE FROM notifications WHERE event_id=?').run(req.params.id);
-    db.prepare('DELETE FROM events WHERE id=?').run(req.params.id);
-  })();
+    await supabase.from('likes').delete().eq('event_id', req.params.id);
+    await supabase.from('matches').delete().eq('event_id', req.params.id);
+    await supabase.from('notifications').delete().eq('event_id', req.params.id);
+    await supabase.from('applications').delete().eq('event_id', req.params.id);
+    await supabase.from('events').delete().eq('id', req.params.id);
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 이벤트 상세 (신청자 포함)
-router.get('/events/:id', requireAdmin, (req, res) => {
-  const event = db.prepare('SELECT * FROM events WHERE id=?').get(req.params.id);
-  if (!event) return res.status(404).json({ error: '없음' });
+router.get('/events/:id', requireAdmin, async (req, res) => {
+  try {
+    const { data: event } = await supabase.from('events').select('*').eq('id', req.params.id).single();
+    if (!event) return res.status(404).json({ error: '없음' });
 
-  const applications = db.prepare(`
-    SELECT a.id as app_id, a.status as app_status, a.created_at as applied_at,
-      u.id, u.name, u.gender, u.age, u.job, u.intro, u.photo, u.email
-    FROM applications a JOIN users u ON u.id=a.user_id
-    WHERE a.event_id=?
-    ORDER BY u.gender, a.created_at ASC
-  `).all(req.params.id);
+    const { data: apps } = await supabase
+      .from('applications')
+      .select('id, status, created_at, users(id, name, gender, age, job, intro, photo, email)')
+      .eq('event_id', req.params.id)
+      .order('created_at');
 
-  res.json({ ...event, applications });
+    const applications = (apps || []).map(a => ({
+      app_id: a.id, app_status: a.status, applied_at: a.created_at,
+      ...a.users
+    }));
+
+    res.json({ ...event, applications });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// 신청 상태 변경 (확정/거절)
-router.patch('/applications/:id', requireAdmin, (req, res) => {
-  const { status } = req.body;
-  if (!['confirmed','rejected','pending'].includes(status))
-    return res.status(400).json({ error: '잘못된 상태값' });
+// 신청 상태 변경
+router.patch('/applications/:id', requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['confirmed','rejected','pending'].includes(status))
+      return res.status(400).json({ error: '잘못된 상태값' });
 
-  const app = db.prepare(`
-    SELECT a.*, u.name, e.title FROM applications a
-    JOIN users u ON u.id=a.user_id
-    JOIN events e ON e.id=a.event_id
-    WHERE a.id=?
-  `).get(req.params.id);
-  if (!app) return res.status(404).json({ error: '없음' });
+    const { data: app } = await supabase
+      .from('applications')
+      .select('*, users(name), events(title)')
+      .eq('id', req.params.id).single();
+    if (!app) return res.status(404).json({ error: '없음' });
 
-  db.prepare('UPDATE applications SET status=? WHERE id=?').run(status, req.params.id);
+    await supabase.from('applications').update({ status }).eq('id', req.params.id);
 
-  // 회원에게 알림 발송
-  const messages = {
-    confirmed: { title: '🎉 참가 확정!', body: `"${app.title}" 이벤트 참가가 확정됐습니다. 행사 당일을 기대해주세요!` },
-    rejected:  { title: '참가 신청 결과', body: `"${app.title}" 이벤트 참가 신청이 아쉽게도 반영되지 않았습니다.` },
-  };
-  if (messages[status]) {
-    db.prepare('INSERT INTO notifications (user_id,title,body,type,event_id) VALUES (?,?,?,?,?)')
-      .run(app.user_id, messages[status].title, messages[status].body, status, app.event_id);
-  }
-
-  res.json({ ok: true });
+    const messages = {
+      confirmed: { title: '🎉 참가 확정!', body: `"${app.events.title}" 이벤트 참가가 확정됐습니다. 행사 당일을 기대해주세요!` },
+      rejected:  { title: '참가 신청 결과', body: `"${app.events.title}" 이벤트 참가 신청이 아쉽게도 반영되지 않았습니다.` },
+    };
+    if (messages[status]) {
+      await supabase.from('notifications').insert({
+        user_id: app.user_id, title: messages[status].title, body: messages[status].body,
+        type: status, event_id: app.event_id
+      });
+    }
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// 이벤트 종료 처리 (좋아요 입력 활성화)
-router.post('/events/:id/finish', requireAdmin, (req, res) => {
-  db.prepare("UPDATE events SET status='finished' WHERE id=?").run(req.params.id);
+// 이벤트 종료
+router.post('/events/:id/finish', requireAdmin, async (req, res) => {
+  try {
+    await supabase.from('events').update({ status: 'finished' }).eq('id', req.params.id);
 
-  // 확정 참가자 전원에게 알림
-  const event = db.prepare('SELECT * FROM events WHERE id=?').get(req.params.id);
-  const confirmed = db.prepare(`
-    SELECT a.user_id FROM applications a WHERE a.event_id=? AND a.status='confirmed'
-  `).all(req.params.id);
+    const { data: event } = await supabase.from('events').select('*').eq('id', req.params.id).single();
+    const { data: confirmed } = await supabase
+      .from('applications').select('user_id').eq('event_id', req.params.id).eq('status', 'confirmed');
 
-  const insertNotif = db.prepare('INSERT INTO notifications (user_id,title,body,type,event_id) VALUES (?,?,?,?,?)');
-  db.transaction(() => {
-    confirmed.forEach(({ user_id }) => {
-      insertNotif.run(user_id,
-        '💌 좋아요를 입력해주세요!',
-        `"${event.title}" 행사가 종료됐습니다. 마음에 드셨던 분들께 좋아요를 보내보세요!`,
-        'likes_open', event.id
+    if (confirmed && confirmed.length > 0) {
+      await supabase.from('notifications').insert(
+        confirmed.map(({ user_id }) => ({
+          user_id,
+          title: '💌 좋아요를 입력해주세요!',
+          body: `"${event.title}" 행사가 종료됐습니다. 마음에 드셨던 분들께 좋아요를 보내보세요!`,
+          type: 'likes_open', event_id: event.id
+        }))
       );
-    });
-  })();
-
-  res.json({ ok: true });
+    }
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 매칭 집계
-router.post('/events/:id/compute-matches', requireAdmin, (req, res) => {
-  const eventId = req.params.id;
-  const likes = db.prepare('SELECT from_user_id, to_user_id FROM likes WHERE event_id=?').all(eventId);
-  const likeSet = new Set(likes.map(l => `${l.from_user_id}-${l.to_user_id}`));
+router.post('/events/:id/compute-matches', requireAdmin, async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const { data: likes } = await supabase
+      .from('likes').select('from_user_id, to_user_id').eq('event_id', eventId);
 
-  const seen = new Set();
-  const matched = [];
-  likes.forEach(l => {
-    if (likeSet.has(`${l.to_user_id}-${l.from_user_id}`)) {
-      const key = [l.from_user_id, l.to_user_id].sort((a,b)=>a-b).join('-');
-      if (!seen.has(key)) { seen.add(key); matched.push(key.split('-').map(Number)); }
-    }
-  });
+    const likeSet = new Set((likes || []).map(l => `${l.from_user_id}-${l.to_user_id}`));
+    const seen = new Set();
+    const matched = [];
 
-  db.prepare('DELETE FROM matches WHERE event_id=?').run(eventId);
-  const insert = db.prepare('INSERT INTO matches (event_id,user1_id,user2_id) VALUES (?,?,?)');
-  const event = db.prepare('SELECT title FROM events WHERE id=?').get(eventId);
-
-  // 매칭 저장 + 당사자 알림
-  const insertNotif = db.prepare('INSERT INTO notifications (user_id,title,body,type,event_id) VALUES (?,?,?,?,?)');
-  db.transaction(() => {
-    matched.forEach(([u1, u2]) => {
-      insert.run(eventId, u1, u2);
-      const partner1 = db.prepare('SELECT name FROM users WHERE id=?').get(u2);
-      const partner2 = db.prepare('SELECT name FROM users WHERE id=?').get(u1);
-      insertNotif.run(u1, '💕 매칭 성공!', `"${event.title}"에서 ${partner1.name}님과 매칭됐습니다!`, 'match', eventId);
-      insertNotif.run(u2, '💕 매칭 성공!', `"${event.title}"에서 ${partner2.name}님과 매칭됐습니다!`, 'match', eventId);
+    (likes || []).forEach(l => {
+      if (likeSet.has(`${l.to_user_id}-${l.from_user_id}`)) {
+        const key = [l.from_user_id, l.to_user_id].sort((a,b)=>a-b).join('-');
+        if (!seen.has(key)) { seen.add(key); matched.push(key.split('-').map(Number)); }
+      }
     });
-  })();
 
-  res.json({ count: matched.length });
+    await supabase.from('matches').delete().eq('event_id', eventId);
+
+    const { data: event } = await supabase.from('events').select('title').eq('id', eventId).single();
+
+    if (matched.length > 0) {
+      await supabase.from('matches').insert(
+        matched.map(([u1, u2]) => ({ event_id: eventId, user1_id: u1, user2_id: u2 }))
+      );
+
+      // 매칭 알림
+      const notifs = [];
+      for (const [u1, u2] of matched) {
+        const { data: p1 } = await supabase.from('users').select('name').eq('id', u2).single();
+        const { data: p2 } = await supabase.from('users').select('name').eq('id', u1).single();
+        notifs.push({ user_id: u1, title: '💕 매칭 성공!', body: `"${event.title}"에서 ${p1.name}님과 매칭됐습니다!`, type: 'match', event_id: eventId });
+        notifs.push({ user_id: u2, title: '💕 매칭 성공!', body: `"${event.title}"에서 ${p2.name}님과 매칭됐습니다!`, type: 'match', event_id: eventId });
+      }
+      await supabase.from('notifications').insert(notifs);
+    }
+
+    res.json({ count: matched.length });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 매칭 결과 조회
-router.get('/events/:id/matches', requireAdmin, (req, res) => {
-  const matches = db.prepare(`
-    SELECT m.id,
-      u1.id as u1_id, u1.name as u1_name, u1.gender as u1_gender, u1.age as u1_age, u1.photo as u1_photo, u1.job as u1_job,
-      u2.id as u2_id, u2.name as u2_name, u2.gender as u2_gender, u2.age as u2_age, u2.photo as u2_photo, u2.job as u2_job
-    FROM matches m
-    JOIN users u1 ON u1.id=m.user1_id
-    JOIN users u2 ON u2.id=m.user2_id
-    WHERE m.event_id=?
-  `).all(req.params.id);
-  res.json(matches);
+router.get('/events/:id/matches', requireAdmin, async (req, res) => {
+  try {
+    const { data } = await supabase
+      .from('matches')
+      .select('id, user1:user1_id(id,name,gender,age,photo,job), user2:user2_id(id,name,gender,age,photo,job)')
+      .eq('event_id', req.params.id);
+    res.json(data || []);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// D-5 알림 발송 (스케줄러에서 호출)
-router.post('/events/send-reminders', requireAdmin, (req, res) => {
-  const today = new Date();
-  const target = new Date(today); target.setDate(today.getDate() + 5);
-  const targetDate = target.toISOString().split('T')[0];
+// D-5 알림 발송
+router.post('/events/send-reminders', requireAdmin, async (req, res) => {
+  try {
+    const today = new Date(); const target = new Date(today);
+    target.setDate(today.getDate() + 5);
+    const targetDate = target.toISOString().split('T')[0];
 
-  const events = db.prepare("SELECT * FROM events WHERE date=? AND status='closed'").all(targetDate);
-  const insertNotif = db.prepare('INSERT INTO notifications (user_id,title,body,type,event_id) VALUES (?,?,?,?,?)');
-
-  let count = 0;
-  db.transaction(() => {
-    events.forEach(event => {
-      const confirmed = db.prepare("SELECT user_id FROM applications WHERE event_id=? AND status='confirmed'").all(event.id);
-      confirmed.forEach(({ user_id }) => {
-        insertNotif.run(user_id,
-          `⏰ D-5 ${event.title}`,
-          `${event.date} ${event.time}, ${event.cafe_name}에서 만나요! 기대해주세요 ☕`,
-          'reminder', event.id
+    const { data: events } = await supabase.from('events').select('*').eq('date', targetDate).eq('status', 'closed');
+    let count = 0;
+    for (const event of (events || [])) {
+      const { data: confirmed } = await supabase
+        .from('applications').select('user_id').eq('event_id', event.id).eq('status', 'confirmed');
+      if (confirmed && confirmed.length > 0) {
+        await supabase.from('notifications').insert(
+          confirmed.map(({ user_id }) => ({
+            user_id, title: `⏰ D-5 ${event.title}`,
+            body: `${event.date} ${event.time}, ${event.cafe_name}에서 만나요! ☕`,
+            type: 'reminder', event_id: event.id
+          }))
         );
-        count++;
-      });
-    });
-  })();
-
-  res.json({ sent: count });
+        count += confirmed.length;
+      }
+    }
+    res.json({ sent: count });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 회원 목록
-router.get('/users', requireAdmin, (req, res) => {
-  const users = db.prepare(`
-    SELECT id,name,gender,age,job,intro,photo,email,status,created_at FROM users
-    WHERE email != 'admin@youandme.kr' ORDER BY created_at DESC
-  `).all();
-  res.json(users);
+router.get('/users', requireAdmin, async (req, res) => {
+  try {
+    const { data } = await supabase
+      .from('users')
+      .select('id,name,gender,age,job,intro,photo,email,status,created_at')
+      .neq('email', 'admin@youandme.kr')
+      .order('created_at', { ascending: false });
+    res.json(data || []);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // 회원 승인/거절
-router.patch('/users/:id/status', requireAdmin, (req, res) => {
-  const { status } = req.body;
-  if (!['approved', 'rejected', 'pending'].includes(status))
-    return res.status(400).json({ error: '잘못된 상태값' });
+router.patch('/users/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['approved','rejected','pending'].includes(status))
+      return res.status(400).json({ error: '잘못된 상태값' });
 
-  const user = db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id);
-  if (!user) return res.status(404).json({ error: '없음' });
+    const { data: user } = await supabase.from('users').select('*').eq('id', req.params.id).single();
+    if (!user) return res.status(404).json({ error: '없음' });
 
-  db.prepare('UPDATE users SET status=? WHERE id=?').run(status, req.params.id);
+    await supabase.from('users').update({ status }).eq('id', req.params.id);
 
-  if (status === 'approved') {
-    db.prepare('INSERT INTO notifications (user_id,title,body,type) VALUES (?,?,?,?)')
-      .run(user.id, '🎉 가입이 승인됐습니다!', 'YouAndMe 회원으로 승인됐습니다. 이벤트를 둘러보세요!', 'info');
-  } else if (status === 'rejected') {
-    db.prepare('INSERT INTO notifications (user_id,title,body,type) VALUES (?,?,?,?)')
-      .run(user.id, '가입 신청 결과', '아쉽게도 가입 신청이 반려됐습니다. 운영자에게 문의해주세요.', 'info');
-  }
-
-  res.json({ ok: true });
+    const messages = {
+      approved: { title: '🎉 가입이 승인됐습니다!', body: 'YouAndMe 회원으로 승인됐습니다. 이벤트를 둘러보세요!' },
+      rejected: { title: '가입 신청 결과', body: '아쉽게도 가입 신청이 반려됐습니다. 운영자에게 문의해주세요.' },
+    };
+    if (messages[status]) {
+      await supabase.from('notifications').insert({
+        user_id: user.id, title: messages[status].title, body: messages[status].body, type: 'info'
+      });
+    }
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 module.exports = router;

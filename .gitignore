@@ -4,5 +4,6 @@ client/node_modules/
 server/youandme.db
 server/uploads/
 .env
+server/.env
 *.local
 dist/

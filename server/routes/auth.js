@@ -1,52 +1,66 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const supabase = require('../db');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'youandme_secret_2024';
 
-router.post('/register', (req, res) => {
-  const { name, gender, age, job, intro, email, password } = req.body;
-  if (!name || !gender || !age || !email || !password)
-    return res.status(400).json({ error: '필수 항목을 입력해주세요.' });
+// 회원가입
+router.post('/register', async (req, res) => {
+  try {
+    const { name, gender, age, job, intro, email, password } = req.body;
+    if (!name || !gender || !age || !email || !password)
+      return res.status(400).json({ error: '필수 항목을 입력해주세요.' });
 
-  if (db.prepare('SELECT id FROM users WHERE email=?').get(email))
-    return res.status(409).json({ error: '이미 사용 중인 이메일입니다.' });
+    const { data: existing } = await supabase.from('users').select('id').eq('email', email).maybeSingle();
+    if (existing) return res.status(409).json({ error: '이미 사용 중인 이메일입니다.' });
 
-  const hash = bcrypt.hashSync(password, 10);
-  const result = db.prepare(
-    'INSERT INTO users (name,gender,age,job,intro,email,password,status) VALUES (?,?,?,?,?,?,?,?)'
-  ).run(name, gender, parseInt(age), job||'', intro||'', email, hash, 'pending');
+    const hash = bcrypt.hashSync(password, 10);
+    const { data: user, error } = await supabase
+      .from('users')
+      .insert({ name, gender, age: parseInt(age), job: job||'', intro: intro||'', email, password: hash, status: 'pending' })
+      .select('id,name,gender,age,job,intro,photo,email,status')
+      .single();
 
-  const user = db.prepare('SELECT id,name,gender,age,job,intro,photo,email,status FROM users WHERE id=?').get(result.lastInsertRowid);
-  const token = jwt.sign({ id: user.id, email, isAdmin: false }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user });
+    if (error) return res.status(500).json({ error: error.message });
+
+    const token = jwt.sign({ id: user.id, email, isAdmin: false }, JWT_SECRET, { expiresIn: '30d' });
+    res.json({ token, user });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  const user = db.prepare('SELECT * FROM users WHERE email=?').get(email);
-  if (!user || !bcrypt.compareSync(password, user.password))
-    return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+// 로그인
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { data: user } = await supabase.from('users').select('*').eq('email', email).maybeSingle();
+    if (!user || !bcrypt.compareSync(password, user.password))
+      return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않습니다.' });
 
-  if (user.status === 'rejected')
-    return res.status(403).json({ error: '가입이 거절된 계정입니다. 운영자에게 문의해주세요.' });
+    if (user.status === 'rejected')
+      return res.status(403).json({ error: '가입이 거절된 계정입니다. 운영자에게 문의해주세요.' });
 
-  const isAdmin = email === 'admin@youandme.kr';
-  const token = jwt.sign({ id: user.id, email, isAdmin }, JWT_SECRET, { expiresIn: '30d' });
-  const { password: _, ...safe } = user;
-  res.json({ token, user: { ...safe, isAdmin } });
+    const isAdmin = email === 'admin@youandme.kr';
+    const token = jwt.sign({ id: user.id, email, isAdmin }, JWT_SECRET, { expiresIn: '30d' });
+    const { password: _, ...safe } = user;
+    res.json({ token, user: { ...safe, isAdmin } });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.get('/me', requireAuth, (req, res) => {
-  const user = db.prepare('SELECT id,name,gender,age,job,intro,photo,email,status FROM users WHERE id=?').get(req.user.id);
-  if (!user) return res.status(404).json({ error: '없음' });
-  res.json({ ...user, isAdmin: req.user.isAdmin });
+// 내 정보
+router.get('/me', requireAuth, async (req, res) => {
+  try {
+    const { data: user } = await supabase
+      .from('users').select('id,name,gender,age,job,intro,photo,email,status').eq('id', req.user.id).single();
+    if (!user) return res.status(404).json({ error: '없음' });
+    res.json({ ...user, isAdmin: req.user.isAdmin });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.patch('/photo', requireAuth, (req, res) => {
-  db.prepare('UPDATE users SET photo=? WHERE id=?').run(req.body.photo, req.user.id);
+// 프로필 사진 업데이트
+router.patch('/photo', requireAuth, async (req, res) => {
+  await supabase.from('users').update({ photo: req.body.photo }).eq('id', req.user.id);
   res.json({ ok: true });
 });
 

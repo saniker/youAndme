@@ -97,7 +97,7 @@ export default function AdminEventsPage() {
 
       {/* 이벤트 생성 모달 */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.5)' }}
+        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}
           onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
           <div className="w-full max-w-[430px] mx-auto rounded-t-3xl" style={{ background: '#fffdf9', maxHeight: '90vh', overflowY: 'auto' }}>
             <div className="px-5 pt-5 pb-3 sticky top-0" style={{ background: '#fffdf9', borderBottom: '1px solid #e8d5b7' }}>
