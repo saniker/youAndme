@@ -95,7 +95,7 @@ function scheduleReminders() {
 }
 
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, async () => {
+server.listen(PORT, '0.0.0.0', async () => {
   console.log(`✅ YouAndMe 서버 → http://localhost:${PORT}`);
   await initAdmin();
   scheduleReminders();
