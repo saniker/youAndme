@@ -75,7 +75,7 @@ export default function HomePage() {
         {/* 메인 CTA 카드 */}
         <div className="rounded-3xl overflow-hidden mb-4"
           style={{ background: '#fffdf9', boxShadow: '0 8px 32px rgba(74,44,23,0.15)' }}>
-          <div className="h-48 flex items-center justify-center relative overflow-hidden">
+          <div className="h-72 flex items-center justify-center relative overflow-hidden">
             {/* 배경 이미지 */}
             <img
               src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&q=80"
