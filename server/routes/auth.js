@@ -64,6 +64,34 @@ router.patch('/photo', requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
+// 이름 수정
+router.patch('/profile', requireAuth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: '이름을 입력해주세요.' });
+    const { error } = await supabase.from('users').update({ name: name.trim() }).eq('id', req.user.id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 비밀번호 변경
+router.patch('/password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
+    if (newPassword.length < 6) return res.status(400).json({ error: '새 비밀번호는 6자 이상이어야 합니다.' });
+
+    const { data: user } = await supabase.from('users').select('password').eq('id', req.user.id).single();
+    if (!bcrypt.compareSync(currentPassword, user.password))
+      return res.status(400).json({ error: '현재 비밀번호가 올바르지 않습니다.' });
+
+    const hash = bcrypt.hashSync(newPassword, 10);
+    await supabase.from('users').update({ password: hash }).eq('id', req.user.id);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 function requireAuth(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: '인증이 필요합니다.' });
