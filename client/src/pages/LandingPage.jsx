@@ -78,6 +78,11 @@ export default function LandingPage() {
         </button>
       </div>
 
+      <div className="mt-10 text-center" style={{ color: '#c9b49a' }}>
+        <p className="text-xs">© {new Date().getFullYear()} youAndme. All rights reserved.</p>
+        <p className="text-xs mt-0.5" style={{ color: '#d8c9b8' }}>너랑나랑 · 로테이션 소개팅 플랫폼</p>
+      </div>
+
       <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }`}</style>
     </div>
   );

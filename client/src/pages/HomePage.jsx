@@ -142,6 +142,12 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+
+        {/* 카피라이트 */}
+        <div className="text-center py-4">
+          <p className="text-xs" style={{ color: '#c9b49a' }}>© {new Date().getFullYear()} youAndme. All rights reserved.</p>
+          <p className="text-xs mt-0.5" style={{ color: '#d8c9b8' }}>너랑나랑 · 로테이션 소개팅 플랫폼</p>
+        </div>
       </div>
 
       {/* 하단 네비 */}
