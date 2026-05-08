@@ -264,6 +264,26 @@ router.get('/users', requireAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// 회원 삭제
+router.delete('/users/:id', requireAdmin, async (req, res) => {
+  try {
+    const { data: user } = await supabase.from('users').select('id,email').eq('id', req.params.id).single();
+    if (!user) return res.status(404).json({ error: '없음' });
+    if (user.email === 'admin@youandme.kr') return res.status(403).json({ error: '관리자 계정은 삭제할 수 없습니다.' });
+
+    // 연관 데이터 삭제 (ON DELETE CASCADE 없는 경우 대비)
+    await supabase.from('notifications').delete().eq('user_id', req.params.id);
+    await supabase.from('likes').delete().eq('from_user_id', req.params.id);
+    await supabase.from('likes').delete().eq('to_user_id', req.params.id);
+    await supabase.from('matches').delete().eq('user1_id', req.params.id);
+    await supabase.from('matches').delete().eq('user2_id', req.params.id);
+    await supabase.from('applications').delete().eq('user_id', req.params.id);
+    await supabase.from('users').delete().eq('id', req.params.id);
+
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // 회원 승인/거절
 router.patch('/users/:id/status', requireAdmin, async (req, res) => {
   try {

@@ -32,6 +32,15 @@ export default function AdminUsersPage() {
     } catch { showToast('오류가 발생했습니다.'); }
   }
 
+  async function deleteUser(userId, userName) {
+    if (!window.confirm(`"${userName}" 회원을 삭제하시겠습니까?\n삭제 후 복구가 불가능합니다.`)) return;
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      showToast('🗑 회원이 삭제됐습니다.');
+      fetchUsers();
+    } catch { showToast('삭제에 실패했습니다.'); }
+  }
+
   // 신청승인관리 필터
   const approvalList = users.filter(u => u.status === approvalTab);
 
@@ -109,7 +118,7 @@ export default function AdminUsersPage() {
                 </div>
               )}
               {approvalList.map(u => (
-                <UserCard key={u.id} u={u} onUpdate={updateStatus} showActions />
+                <UserCard key={u.id} u={u} onUpdate={updateStatus} onDelete={deleteUser} showActions />
               ))}
             </div>
           )}
@@ -147,7 +156,7 @@ export default function AdminUsersPage() {
                 </div>
               )}
               {memberList.map(u => (
-                <UserCard key={u.id} u={u} onUpdate={updateStatus} />
+                <UserCard key={u.id} u={u} onUpdate={updateStatus} onDelete={deleteUser} />
               ))}
             </div>
           )}
@@ -160,7 +169,7 @@ export default function AdminUsersPage() {
   );
 }
 
-function UserCard({ u, onUpdate, showActions }) {
+function UserCard({ u, onUpdate, onDelete, showActions }) {
   return (
     <div className="rounded-2xl overflow-hidden"
       style={{ background: '#fffdf9', boxShadow: '0 4px 20px rgba(74,44,23,0.08)' }}>
@@ -179,8 +188,16 @@ function UserCard({ u, onUpdate, showActions }) {
             </div>
             <div className="text-xs truncate" style={{ color: '#c9956a' }}>{u.email}</div>
           </div>
-          <div className="text-xs text-right flex-shrink-0" style={{ color: '#a07850' }}>
-            {new Date(u.created_at).toLocaleDateString('ko-KR')}
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <div className="text-xs" style={{ color: '#a07850' }}>
+              {new Date(u.created_at).toLocaleDateString('ko-KR')}
+            </div>
+            {/* 삭제 버튼 */}
+            <button onClick={() => onDelete(u.id, u.name)}
+              className="text-xs px-2 py-1 rounded-lg"
+              style={{ background: '#fce8e8', color: '#c45f5f' }}>
+              🗑 삭제
+            </button>
           </div>
         </div>
 
