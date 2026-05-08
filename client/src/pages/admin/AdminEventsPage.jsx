@@ -107,18 +107,30 @@ export default function AdminEventsPage() {
             </div>
             {/* 내용 - 스크롤 */}
             <div className="p-5 space-y-3 overflow-y-auto flex-1">
-              {[
-                ['이벤트 이름 *', 'title', 'text', '예: 2024 봄 로테이션 소개팅'],
-                ['지역 *', 'region', 'text', '예: 서울, 부산, 제주'],
-                ['카페 이름 *', 'cafeName', 'text', '카페명 입력'],
-                ['카페 주소', 'cafeAddress', 'text', '상세 주소 (선택)'],
-              ].map(([label, key, type, ph]) => (
-                <div key={key}>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>{label}</label>
-                  <input style={inp} type={type} placeholder={ph}
-                    value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
-                </div>
-              ))}
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>이벤트 이름 *</label>
+                <input style={inp} type="text" placeholder="예: 2024 봄 로테이션 소개팅"
+                  value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>지역 *</label>
+                <select style={inp} value={form.region} onChange={e => setForm(f => ({ ...f, region: e.target.value }))}>
+                  <option value="">지역 선택</option>
+                  {['서울','경기','인천','부산','대구','광주','대전','제주'].map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>카페 이름 *</label>
+                <input style={inp} type="text" placeholder="카페명 입력"
+                  value={form.cafeName} onChange={e => setForm(f => ({ ...f, cafeName: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>카페 주소</label>
+                <input style={inp} type="text" placeholder="상세 주소 (선택)"
+                  value={form.cafeAddress} onChange={e => setForm(f => ({ ...f, cafeAddress: e.target.value }))} />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>날짜 *</label>
