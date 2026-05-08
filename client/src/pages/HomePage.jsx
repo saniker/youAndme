@@ -78,7 +78,7 @@ export default function HomePage() {
           <div className="h-48 flex items-center justify-center relative overflow-hidden">
             {/* 배경 이미지 */}
             <img
-              src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80"
+              src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&q=80"
               alt="couple"
               className="absolute inset-0 w-full h-full object-cover"
             />
