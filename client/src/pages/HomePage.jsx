@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store';
-import api from '../api';
+import api, { getPhotoUrl } from '../api';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ export default function HomePage() {
               className="w-10 h-10 rounded-full overflow-hidden border-2 flex items-center justify-center"
               style={{ borderColor: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.15)' }}>
               {user?.photo
-                ? <img src={user.photo} alt="" className="w-full h-full object-cover" />
+                ? <img src={getPhotoUrl(user.photo)} alt="" className="w-full h-full object-cover" />
                 : <span style={{ fontSize: 20 }}>{user?.gender === 'M' ? '👨' : '👩'}</span>}
             </button>
           </div>

@@ -95,7 +95,10 @@ export function Card({ children, className = '' }) {
 
 export function Avatar({ src, name, size = 'md' }) {
   const sizes = { sm: 'w-10 h-10 text-lg', md: 'w-14 h-14 text-2xl', lg: 'w-24 h-24 text-4xl', xl: 'w-32 h-32 text-5xl' };
-  if (src) return <img src={src} alt={name} className={`${sizes[size]} rounded-full object-cover border-2`} style={{ borderColor: '#e8d5b7' }} />;
+  const fullSrc = src
+    ? (src.startsWith('http') ? src : `${import.meta.env.VITE_API_URL || ''}${src}`)
+    : null;
+  if (fullSrc) return <img src={fullSrc} alt={name} className={`${sizes[size]} rounded-full object-cover border-2`} style={{ borderColor: '#e8d5b7' }} />;
   return (
     <div className={`${sizes[size]} rounded-full flex items-center justify-center`}
       style={{ background: 'linear-gradient(135deg, #e8d5b7 0%, #f2e4cc 100%)', color: '#c9956a' }}>

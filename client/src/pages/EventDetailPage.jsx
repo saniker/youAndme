@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../api';
+import api, { getPhotoUrl } from '../api';
 import { Spinner, Toast } from '../components/Layout';
 
 const STATUS_MAP = {
@@ -72,7 +72,7 @@ export default function EventDetailPage() {
       {/* 헤더 이미지 */}
       <div className="relative h-56" style={{ background: 'linear-gradient(135deg, #c9956a 0%, #7b4f2e 100%)' }}>
         {event.thumbnail
-          ? <img src={event.thumbnail} alt="" className="w-full h-full object-cover" />
+          ? <img src={getPhotoUrl(event.thumbnail)} alt="" className="w-full h-full object-cover" />
           : <div className="h-full flex flex-col items-center justify-center">
               <div className="text-6xl mb-2">☕</div>
               <div className="text-white font-medium">{event.cafe_name}</div>

@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { getPhotoUrl } from '../api';
 import { useAuthStore } from '../store';
 import { Spinner, Avatar } from '../components/Layout';
 
@@ -66,7 +66,7 @@ export default function EventListPage() {
               className="w-8 h-8 rounded-full overflow-hidden border-2 flex items-center justify-center"
               style={{ borderColor: '#c9956a' }}>
               {user?.photo
-                ? <img src={user.photo} alt="" className="w-full h-full object-cover" />
+                ? <img src={getPhotoUrl(user.photo)} alt="" className="w-full h-full object-cover" />
                 : <span style={{ fontSize: 16 }}>{user?.gender === 'M' ? '👨' : '👩'}</span>}
             </button>
           </div>
@@ -134,7 +134,7 @@ function EventCard({ event: ev, onClick }) {
       <div className="h-40 flex items-center justify-center relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #c9956a 0%, #7b4f2e 100%)' }}>
         {ev.thumbnail
-          ? <img src={ev.thumbnail} alt="" className="w-full h-full object-cover" />
+          ? <img src={getPhotoUrl(ev.thumbnail)} alt="" className="w-full h-full object-cover" />
           : <div className="text-center">
               <div className="text-5xl mb-1">☕</div>
               <div className="text-white text-sm font-medium opacity-80">{ev.cafe_name}</div>
