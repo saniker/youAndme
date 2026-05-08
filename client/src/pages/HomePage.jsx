@@ -75,12 +75,19 @@ export default function HomePage() {
         {/* 메인 CTA 카드 */}
         <div className="rounded-3xl overflow-hidden mb-4"
           style={{ background: '#fffdf9', boxShadow: '0 8px 32px rgba(74,44,23,0.15)' }}>
-          <div className="h-36 flex items-center justify-center relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #c9956a 0%, #7b4f2e 100%)' }}>
-            <div className="absolute inset-0 flex items-center justify-center opacity-10 text-8xl">☕</div>
-            <div className="text-center relative z-10">
-              <p className="text-white text-sm mb-1 opacity-80">설레는 만남이 기다려요</p>
-              <p className="text-white text-2xl font-semibold" style={{ fontFamily: "'Playfair Display',serif" }}>
+          <div className="h-48 flex items-center justify-center relative overflow-hidden">
+            {/* 배경 이미지 */}
+            <img
+              src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80"
+              alt="couple"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* 어두운 오버레이 */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(74,44,23,0.65) 0%, rgba(30,10,5,0.75) 100%)' }} />
+            {/* 텍스트 */}
+            <div className="text-center relative z-10 px-4">
+              <p className="text-white text-sm mb-2 tracking-wide" style={{ opacity: 0.9 }}>✨ 설레는 만남이 기다려요</p>
+              <p className="text-white text-2xl font-semibold" style={{ fontFamily: "'Playfair Display',serif", textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
                 로테이션 소개팅
               </p>
             </div>
