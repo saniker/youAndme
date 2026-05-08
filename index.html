@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>YouAndMe ☕ 로테이션 소개팅</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .landing-hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+      text-align: center;
+    }
+    .hero-icon {
+      font-size: 72px;
+      margin-bottom: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      color: var(--brown-deep);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-light);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.8;
+      margin-bottom: 48px;
+      max-width: 320px;
+    }
+    .hero-desc strong { color: var(--brown); }
+    .btn-group { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
+    .divider-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-light);
+      font-size: 13px;
+      margin: 4px 0;
+    }
+    .divider-text::before, .divider-text::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--cream);
+    }
+    .feature-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .feature-item {
+      flex: 1;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 16px 10px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .feature-icon { font-size: 24px; margin-bottom: 6px; }
+    .feature-label { font-size: 11px; color: var(--text-mid); font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="landing-hero">
+    <div class="hero-icon">☕</div>
+    <div class="hero-title">YouAndMe</div>
+    <div class="hero-sub">Rotation Dating</div>
+
+    <div class="feature-row">
+      <div class="feature-item">
+        <div class="feature-icon">👥</div>
+        <div class="feature-label">10 vs 10</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⏱</div>
+        <div class="feature-label">10분 대화</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">💌</div>
+        <div class="feature-label">매칭 결과</div>
+      </div>
+    </div>
+
+    <p class="hero-desc">
+      카페에서 만나는 <strong>설레는 첫 만남</strong><br>
+      10명의 이성과 차례로 대화하고<br>
+      마음이 맞는 상대를 찾아보세요
+    </p>
+
+    <div class="btn-group">
+      <a class="btn btn-primary" href="login.html">
+        ☕ 로그인
+      </a>
+      <div class="divider-text">처음 오셨나요?</div>
+      <a class="btn btn-outline" href="register.html">
+        ✨ 회원가입
+      </a>
+    </div>
+
+    <div style="margin-top: 32px; font-size: 12px; color: var(--text-light);">
+      운영자이신가요? <a href="admin/index.html" style="color: var(--brown); text-decoration: underline;">운영자 페이지</a>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+<script>
+  // 이미 로그인된 경우 리다이렉트
+  const u = getCurrentUser();
+  if (u) {
+    if (u.status === 'approved') {
+      const ev = getActiveEvent();
+      if (ev && ev.status === 'active') goTo('event.html');
+      else goTo('waiting.html');
+    } else {
+      goTo('waiting.html');
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); node --version; npm --version)",
+      "PowerShell(Start-Sleep -Seconds 6; Invoke-WebRequest -Uri \"http://localhost:5173\" -UseBasicParsing -ErrorAction SilentlyContinue | Select-Object StatusCode, @{n='ok';e={$_.Content.Length -gt 0}})",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); $token = \\(Invoke-WebRequest -Uri \"http://localhost:4000/api/auth/login\" -Method POST -Body '{\"email\":\"admin@youandme.kr\",\"password\":\"admin1234\"}' -ContentType \"application/json\" -UseBasicParsing | ConvertFrom-Json\\).token; $body = '{\"title\":\"테스트 이벤트\",\"region\":\"서울\",\"cafeName\":\"스타벅스 강남점\",\"date\":\"2026-06-01\",\"time\":\"18:00\"}'; $resp = Invoke-WebRequest -Uri \"http://localhost:4000/api/admin/events\" -Method POST -Body $body -ContentType \"application/json\" -Headers @{Authorization=\"Bearer $token\"} -UseBasicParsing; $resp.Content)",
+      "PowerShell(Start-Sleep -Seconds 5; $env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); try { Invoke-WebRequest -Uri \"http://localhost:4000/api/auth/login\" -Method POST -Body '{\"email\":\"admin@youandme.kr\",\"password\":\"admin1234\"}' -ContentType \"application/json\" -UseBasicParsing | Out-Null; \"✅ 백엔드 정상\" } catch { \"백엔드: $_\" }; try { Invoke-WebRequest -Uri \"http://localhost:5173\" -UseBasicParsing | Out-Null; \"✅ 프론트 정상\" } catch { \"프론트: $_\" })",
+      "Bash(cd /d D:\\\\claude\\\\youAndme\\\\server)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
