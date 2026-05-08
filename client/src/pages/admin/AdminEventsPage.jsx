@@ -99,11 +99,14 @@ export default function AdminEventsPage() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}
           onClick={e => e.target === e.currentTarget && setShowCreate(false)}>
-          <div className="w-full max-w-[430px] mx-auto rounded-t-3xl" style={{ background: '#fffdf9', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div className="px-5 pt-5 pb-3 sticky top-0" style={{ background: '#fffdf9', borderBottom: '1px solid #e8d5b7' }}>
+          <div className="w-full max-w-[430px] mx-auto rounded-t-3xl flex flex-col"
+            style={{ background: '#fffdf9', maxHeight: '90vh' }}>
+            {/* 헤더 - 고정 */}
+            <div className="px-5 pt-5 pb-3 flex-shrink-0" style={{ borderBottom: '1px solid #e8d5b7' }}>
               <h3 className="font-semibold" style={{ color: '#4a2c17' }}>새 이벤트 만들기</h3>
             </div>
-            <div className="p-5 space-y-3">
+            {/* 내용 - 스크롤 */}
+            <div className="p-5 space-y-3 overflow-y-auto flex-1">
               {[
                 ['이벤트 이름 *', 'title', 'text', '예: 2024 봄 로테이션 소개팅'],
                 ['지역 *', 'region', 'text', '예: 서울, 부산, 제주'],
@@ -139,13 +142,14 @@ export default function AdminEventsPage() {
                 <textarea style={{ ...inp, minHeight: 80, resize: 'none' }} placeholder="이벤트 설명을 입력하세요"
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
               </div>
-              <div className="flex gap-2 pt-2 pb-4">
-                <button onClick={() => setShowCreate(false)}
-                  className="flex-1 py-3 rounded-xl text-sm border" style={{ borderColor: '#c9956a', color: '#7b4f2e' }}>취소</button>
-                <button onClick={createEvent}
-                  className="flex-1 py-3 rounded-xl text-sm font-medium text-white"
-                  style={{ background: 'linear-gradient(135deg, #7b4f2e, #a0704a)' }}>생성</button>
-              </div>
+            </div>
+            {/* 버튼 - 항상 하단 고정 */}
+            <div className="flex gap-2 px-5 py-4 flex-shrink-0" style={{ borderTop: '1px solid #e8d5b7', background: '#fffdf9' }}>
+              <button onClick={() => setShowCreate(false)}
+                className="flex-1 py-3 rounded-xl text-sm border" style={{ borderColor: '#c9956a', color: '#7b4f2e' }}>취소</button>
+              <button onClick={createEvent}
+                className="flex-1 py-3 rounded-xl text-sm font-medium text-white"
+                style={{ background: 'linear-gradient(135deg, #7b4f2e, #a0704a)' }}>생성</button>
             </div>
           </div>
         </div>
