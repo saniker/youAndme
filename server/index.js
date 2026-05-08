@@ -1,4 +1,8 @@
 require('dotenv').config();
+console.log('🚀 서버 시작 중...');
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? '✅' : '❌ 없음');
+console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? '✅' : '❌ 없음');
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -94,9 +98,16 @@ function scheduleReminders() {
   }, ms);
 }
 
+// 헬스체크
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'YouAndMe API' }));
+
+// 전역 에러 핸들러
+process.on('uncaughtException', (err) => { console.error('❌ uncaughtException:', err); });
+process.on('unhandledRejection', (err) => { console.error('❌ unhandledRejection:', err); });
+
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, '0.0.0.0', async () => {
   console.log(`✅ YouAndMe 서버 → http://localhost:${PORT}`);
-  await initAdmin();
+  try { await initAdmin(); } catch(e) { console.error('initAdmin 오류:', e.message); }
   scheduleReminders();
 });
