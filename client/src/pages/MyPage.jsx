@@ -32,11 +32,11 @@ export default function MyPage() {
   function handleLogout() { logout(); navigate('/'); }
 
   return (
-    <div className="min-h-screen pb-10" style={{ background: '#fdf6ee' }}>
+    <div className="min-h-screen pb-24" style={{ background: '#fdf6ee' }}>
       {/* 헤더 */}
       <div className="sticky top-0 z-50 px-5 py-4 border-b flex items-center justify-between"
         style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
-        <button onClick={() => navigate('/events')} className="text-xl" style={{ color: '#7b4f2e' }}>←</button>
+        <button onClick={() => navigate('/home')} className="text-xl" style={{ color: '#7b4f2e' }}>←</button>
         <span className="font-semibold" style={{ color: '#4a2c17' }}>마이페이지</span>
         <button onClick={handleLogout} className="text-xs px-3 py-1.5 rounded-full border"
           style={{ borderColor: '#c9956a', color: '#7b4f2e' }}>로그아웃</button>
@@ -120,6 +120,23 @@ export default function MyPage() {
           </div>
         )}
       </div>
+
+      {/* 하단 네비 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
+        {[
+          { icon: '🏠', label: '홈', path: '/home' },
+          { icon: '☕', label: '이벤트', path: '/events' },
+          { icon: '👤', label: '마이', path: '/my', active: true },
+        ].map(n => (
+          <button key={n.label} onClick={() => navigate(n.path)}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition-all"
+            style={{ color: n.active ? '#4a2c17' : '#a07850' }}>
+            <span className="text-xl">{n.icon}</span>
+            <span>{n.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
