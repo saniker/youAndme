@@ -7,7 +7,7 @@ export default function LandingPage() {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    if (user && !user.isAdmin) navigate('/events', { replace: true });
+    if (user && !user.isAdmin) navigate('/home', { replace: true });
   }, [user, navigate]);
 
   return (

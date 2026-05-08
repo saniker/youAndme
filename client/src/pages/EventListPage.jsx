@@ -100,6 +100,23 @@ export default function EventListPage() {
           <EventCard key={ev.id} event={ev} onClick={() => navigate(`/events/${ev.id}`)} />
         ))}
       </div>
+
+      {/* 하단 네비 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: '#fffdf9', borderColor: '#e8d5b7' }}>
+        {[
+          { icon: '🏠', label: '홈', path: '/home' },
+          { icon: '☕', label: '이벤트', path: '/events', active: true },
+          { icon: '👤', label: '마이', path: '/my' },
+        ].map(n => (
+          <button key={n.label} onClick={() => navigate(n.path)}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition-all"
+            style={{ color: n.active ? '#4a2c17' : '#a07850' }}>
+            <span className="text-xl">{n.icon}</span>
+            <span>{n.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import WaitingApprovalPage from './pages/WaitingApprovalPage';
+import HomePage from './pages/HomePage';
 import EventListPage from './pages/EventListPage';
 import EventDetailPage from './pages/EventDetailPage';
 import MyPage from './pages/MyPage';
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/pending" element={<WaitingApprovalPage />} />
 
         {/* 회원 */}
+        <Route path="/home" element={<RequireAuth><HomePage /></RequireAuth>} />
         <Route path="/events" element={<RequireAuth><EventListPage /></RequireAuth>} />
         <Route path="/events/:id" element={<RequireAuth><EventDetailPage /></RequireAuth>} />
         <Route path="/events/:id/likes" element={<RequireAuth><LikesPage /></RequireAuth>} />

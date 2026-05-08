@@ -25,7 +25,7 @@ export default function LoginPage() {
       } else if (data.user.status === 'pending') {
         navigate('/pending', { replace: true });
       } else {
-        navigate('/events', { replace: true });
+        navigate('/home', { replace: true });
       }
     } catch (err) {
       showToast(err.response?.data?.error || '로그인에 실패했습니다.');
