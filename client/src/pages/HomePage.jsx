@@ -109,9 +109,9 @@ export default function HomePage() {
         {/* 빠른 메뉴 */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { icon: '📋', label: '내 신청', path: '/events/my' },
-            { icon: '💌', label: '매칭 결과', path: '/events/result' },
-            { icon: '👤', label: '내 프로필', path: '/my' },
+            { icon: '📋', label: '내 신청/결과', path: '/my' },
+            { icon: '☕', label: '이벤트 찾기', path: '/events' },
+            { icon: '🔔', label: '알림', path: '/notifications' },
           ].map(m => (
             <button key={m.label} onClick={() => navigate(m.path)}
               className="rounded-2xl py-4 flex flex-col items-center gap-2 transition-all active:scale-95"
