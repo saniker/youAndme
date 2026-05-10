@@ -218,7 +218,8 @@ function EditProfileModal({ user, inp, onClose, onSaved, showToast }) {
 
       await onSaved();
     } catch (err) {
-      showToast(err.response?.data?.error || '수정에 실패했습니다.');
+      console.error('saveInfo error:', err.response?.status, err.response?.data, err.message);
+      showToast(err.response?.data?.error || err.message || '수정에 실패했습니다.');
     } finally { setSaving(false); }
   }
 

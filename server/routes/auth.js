@@ -68,11 +68,12 @@ router.patch('/photo', requireAuth, async (req, res) => {
 router.patch('/profile', requireAuth, async (req, res) => {
   try {
     const { name } = req.body;
+    console.log('PATCH /profile - user id:', req.user?.id, 'name:', name);
     if (!name || !name.trim()) return res.status(400).json({ error: '이름을 입력해주세요.' });
     const { error } = await supabase.from('users').update({ name: name.trim() }).eq('id', req.user.id);
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) { console.error('profile update error:', error); return res.status(500).json({ error: error.message }); }
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('profile catch:', e); res.status(500).json({ error: e.message }); }
 });
 
 // 비밀번호 변경
