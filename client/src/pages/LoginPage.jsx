@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store';
-import { Header, Toast } from '../components/Layout';
+import { Toast } from '../components/Layout';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -28,49 +28,56 @@ export default function LoginPage() {
     } finally { setLoading(false); }
   }
 
+  const inp = {
+    width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
+    background: '#F2F4F6', color: '#191F28', fontFamily: 'inherit', fontSize: 15, outline: 'none'
+  };
+
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#FFFFFF' }}>
-      <Header title="로그인" onBack={() => navigate('/')} />
+    <div className="flex flex-col items-center justify-center px-5"
+      style={{ height: '100dvh', background: '#191F28' }}>
+      <div className="w-full max-w-sm">
+        {/* 로고 */}
+        <div className="text-center mb-8">
+          <div className="text-4xl mb-3">☕</div>
+          <h1 className="text-2xl font-black text-white mb-1">너랑나랑</h1>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>반갑습니다, 로그인해주세요</p>
+        </div>
 
-      <div className="flex-1 px-6 pt-8 pb-24">
-        <h2 className="text-2xl font-black mb-1" style={{ color: '#191F28' }}>반갑습니다</h2>
-        <p className="text-sm mb-8" style={{ color: '#8B95A1' }}>너랑나랑에 오신 걸 환영해요</p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>이메일</label>
-            <input
-              type="email" placeholder="이메일 주소 입력"
-              value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-              className="w-full px-4 py-4 rounded-2xl text-sm outline-none transition-all"
-              style={{ background: '#F2F4F6', color: '#191F28', fontFamily: 'inherit' }}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>비밀번호</label>
-            <input
-              type="password" placeholder="비밀번호 입력"
-              value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              className="w-full px-4 py-4 rounded-2xl text-sm outline-none transition-all"
-              style={{ background: '#F2F4F6', color: '#191F28', fontFamily: 'inherit' }}
-            />
+        <form onSubmit={handleSubmit}>
+          {/* 입력 카드 */}
+          <div className="rounded-2xl p-5 mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2 text-white">이메일</label>
+              <input style={inp} type="email" placeholder="이메일 주소 입력"
+                value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2 text-white">비밀번호</label>
+              <input style={inp} type="password" placeholder="비밀번호 입력"
+                value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
+            </div>
           </div>
 
-          <div className="pt-2">
-            <button type="submit" disabled={loading}
-              className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-95 disabled:opacity-40"
-              style={{ background: '#3182F6' }}>
-              {loading ? '로그인 중...' : '로그인'}
-            </button>
-          </div>
-
-          <p className="text-center text-sm" style={{ color: '#8B95A1' }}>
-            계정이 없으신가요?{' '}
-            <button type="button" onClick={() => navigate('/register')} className="font-bold" style={{ color: '#3182F6' }}>
-              회원가입
-            </button>
-          </p>
+          <button type="submit" disabled={loading}
+            className="w-full py-4 rounded-2xl font-bold text-base text-white transition-all active:scale-95 disabled:opacity-40"
+            style={{ background: '#3182F6' }}>
+            {loading ? '로그인 중...' : '로그인'}
+          </button>
         </form>
+
+        <p className="text-center text-sm mt-5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          계정이 없으신가요?{' '}
+          <button type="button" onClick={() => navigate('/register')}
+            className="font-bold" style={{ color: '#3182F6' }}>
+            회원가입
+          </button>
+        </p>
+
+        <button onClick={() => navigate('/')} className="mt-4 w-full text-center text-xs"
+          style={{ color: 'rgba(255,255,255,0.3)' }}>
+          ← 처음으로
+        </button>
       </div>
 
       <Toast msg={toast} />
