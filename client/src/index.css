@@ -23,7 +23,11 @@ body {
   color: #2d1a0e;
   max-width: 430px;
   margin: 0 auto;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-#root { min-height: 100vh; }
+#root { min-height: 100dvh; }
+
+/* 모바일 브라우저 주소창 대응: 100vh → 100dvh */
+.min-h-screen { min-height: 100dvh !important; }
+.h-screen { height: 100dvh !important; }
