@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useAuthStore } from '../store';
-import { Header, Btn, Toast } from '../components/Layout';
+import { Toast } from '../components/Layout';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -14,11 +14,7 @@ export default function RegisterPage() {
   const [toast, setToast] = useState('');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2500);
-  }
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(''), 2500); }
 
   async function handlePhotoChange(e) {
     const file = e.target.files[0];
@@ -38,13 +34,10 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      // 1. 회원가입
       const { data } = await api.post('/auth/register', {
         name: form.name, gender: form.gender, age: form.age,
         job: form.job, intro: form.intro, email: form.email, password: form.password
       });
-
-      // 2. 사진 업로드
       if (photo) {
         const fd = new FormData();
         fd.append('photo', photo);
@@ -56,7 +49,6 @@ export default function RegisterPage() {
         });
         data.user.photo = photoData.url;
       }
-
       setAuth({ ...data.user }, data.token);
       showToast('회원가입 완료! 운영자 승인을 기다려주세요 ☕');
       setTimeout(() => navigate('/pending'), 1500);
@@ -67,52 +59,55 @@ export default function RegisterPage() {
     }
   }
 
-  const inputStyle = {
-    width: '100%', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #e8d5b7',
-    background: '#fffdf9', color: '#2d1a0e', fontFamily: 'inherit', fontSize: 14, outline: 'none'
+  const inp = {
+    width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
+    background: '#F2F4F6', color: '#191F28', fontFamily: 'inherit', fontSize: 14, outline: 'none'
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#fdf6ee' }}>
-      <Header title="회원가입" onBack={() => navigate('/')} />
+    <div className="min-h-screen" style={{ background: '#F2F4F6' }}>
+      {/* 헤더 */}
+      <div className="sticky top-0 z-50 px-5 py-4 flex items-center gap-3"
+        style={{ background: '#FFFFFF', borderBottom: '1px solid #F2F4F6' }}>
+        <button onClick={() => navigate('/')} style={{ color: '#191F28', fontSize: 22 }}>←</button>
+        <span className="font-black text-lg" style={{ color: '#191F28' }}>회원가입</span>
+      </div>
 
-      <form onSubmit={handleSubmit} className="px-5 py-6 pb-24 space-y-1">
+      <form onSubmit={handleSubmit} className="px-4 py-4 pb-24 space-y-3">
         {/* 프로필 사진 */}
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center py-4">
           <label className="cursor-pointer relative">
-            <div className="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #e8d5b7, #f2e4cc)', border: '3px solid #c9956a' }}>
+            <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center"
+              style={{ background: '#EBF3FF', border: '3px solid #3182F6' }}>
               {photoPreview
                 ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
-                : <span className="text-4xl">📷</span>
-              }
+                : <span className="text-3xl">📷</span>}
             </div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center text-sm text-white"
-              style={{ background: '#7b4f2e' }}>+</div>
+            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-white text-sm"
+              style={{ background: '#3182F6' }}>+</div>
             <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
           </label>
-          <p className="text-xs mt-2" style={{ color: '#a07850' }}>프로필 사진 (선택)</p>
+          <p className="text-xs mt-2 font-medium" style={{ color: '#8B95A1' }}>프로필 사진 (선택)</p>
         </div>
 
         {/* 기본 정보 */}
-        <div className="rounded-2xl p-4 mb-2" style={{ background: '#fffdf9', boxShadow: '0 4px 20px rgba(74,44,23,0.08)' }}>
-          <p className="text-xs font-semibold mb-3" style={{ color: '#a07850', letterSpacing: 1 }}>기본 정보</p>
+        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <p className="text-sm font-black mb-4" style={{ color: '#191F28' }}>기본 정보</p>
 
-          <div className="mb-3">
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>이름 *</label>
-            <input style={inputStyle} placeholder="이름을 입력하세요" value={form.name} onChange={e => set('name', e.target.value)} />
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>이름 *</label>
+            <input style={inp} placeholder="이름을 입력하세요" value={form.name} onChange={e => set('name', e.target.value)} />
           </div>
 
-          <div className="mb-3">
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>성별 *</label>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>성별 *</label>
             <div className="grid grid-cols-2 gap-2">
               {[['M', '👨 남성'], ['F', '👩 여성']].map(([v, l]) => (
                 <button key={v} type="button" onClick={() => set('gender', v)}
-                  className="py-3 rounded-xl text-sm font-medium transition-all"
+                  className="py-3 rounded-2xl text-sm font-bold transition-all"
                   style={{
-                    border: `2px solid ${form.gender === v ? '#7b4f2e' : '#e8d5b7'}`,
-                    background: form.gender === v ? '#f2e4cc' : '#fffdf9',
-                    color: form.gender === v ? '#4a2c17' : '#a07850'
+                    background: form.gender === v ? '#3182F6' : '#F2F4F6',
+                    color: form.gender === v ? '#FFFFFF' : '#8B95A1',
                   }}>
                   {l}
                 </button>
@@ -120,52 +115,55 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>나이 *</label>
-              <input style={inputStyle} type="number" placeholder="나이" min={18} max={50} value={form.age} onChange={e => set('age', e.target.value)} />
+              <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>나이 *</label>
+              <input style={inp} type="number" placeholder="나이" min={18} max={50}
+                value={form.age} onChange={e => set('age', e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>직업</label>
-              <input style={inputStyle} placeholder="직업" value={form.job} onChange={e => set('job', e.target.value)} />
+              <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>직업</label>
+              <input style={inp} placeholder="직업" value={form.job} onChange={e => set('job', e.target.value)} />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>자기소개</label>
-            <textarea style={{ ...inputStyle, minHeight: 80, resize: 'none' }}
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>자기소개</label>
+            <textarea style={{ ...inp, minHeight: 80, resize: 'none' }}
               placeholder="간단한 자기소개를 작성해주세요 ☕"
               value={form.intro} onChange={e => set('intro', e.target.value)} />
           </div>
         </div>
 
         {/* 계정 정보 */}
-        <div className="rounded-2xl p-4" style={{ background: '#fffdf9', boxShadow: '0 4px 20px rgba(74,44,23,0.08)' }}>
-          <p className="text-xs font-semibold mb-3" style={{ color: '#a07850', letterSpacing: 1 }}>계정 정보</p>
+        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <p className="text-sm font-black mb-4" style={{ color: '#191F28' }}>계정 정보</p>
 
-          <div className="mb-3">
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>이메일 *</label>
-            <input style={inputStyle} type="email" placeholder="이메일 주소" value={form.email} onChange={e => set('email', e.target.value)} />
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>이메일 *</label>
+            <input style={inp} type="email" placeholder="이메일 주소" value={form.email} onChange={e => set('email', e.target.value)} />
           </div>
-          <div className="mb-3">
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>비밀번호 *</label>
-            <input style={inputStyle} type="password" placeholder="6자 이상" value={form.password} onChange={e => set('password', e.target.value)} />
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>비밀번호 *</label>
+            <input style={inp} type="password" placeholder="6자 이상" value={form.password} onChange={e => set('password', e.target.value)} />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b4226' }}>비밀번호 확인 *</label>
-            <input style={inputStyle} type="password" placeholder="비밀번호 재입력" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} />
+            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>비밀번호 확인 *</label>
+            <input style={inp} type="password" placeholder="비밀번호 재입력" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} />
           </div>
         </div>
 
-        <div className="pt-4">
-          <Btn type="submit" disabled={loading}>
-            {loading ? '가입 중...' : '✨ 가입 신청하기'}
-          </Btn>
-        </div>
+        <button type="submit" disabled={loading}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-95 disabled:opacity-40"
+          style={{ background: '#3182F6' }}>
+          {loading ? '가입 중...' : '✨ 가입 신청하기'}
+        </button>
 
-        <p className="text-center text-xs pt-2" style={{ color: '#a07850' }}>
+        <p className="text-center text-sm" style={{ color: '#8B95A1' }}>
           이미 계정이 있으신가요?{' '}
-          <button type="button" onClick={() => navigate('/login')} className="underline" style={{ color: '#7b4f2e' }}>로그인</button>
+          <button type="button" onClick={() => navigate('/login')} className="font-bold" style={{ color: '#3182F6' }}>
+            로그인
+          </button>
         </p>
       </form>
 

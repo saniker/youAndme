@@ -1,20 +1,11 @@
-export function PageLayout({ children }) {
-  return (
-    <div className="min-h-screen" style={{ background: '#fdf6ee' }}>
-      {children}
-    </div>
-  );
-}
-
 export function Header({ title, onBack, right }) {
   return (
-    <div className="sticky top-0 z-50 flex items-center gap-3 px-5 py-4 border-b"
-      style={{ background: '#fffdf9', borderColor: '#e8d5b7', boxShadow: '0 2px 8px rgba(74,44,23,0.07)' }}>
+    <div className="sticky top-0 z-50 flex items-center gap-3 px-5 py-4"
+      style={{ background: '#FFFFFF', borderBottom: '1px solid #F2F4F6' }}>
       {onBack && (
-        <button onClick={onBack} className="text-2xl leading-none" style={{ color: '#7b4f2e' }}>←</button>
+        <button onClick={onBack} style={{ color: '#191F28', fontSize: 22, lineHeight: 1 }}>←</button>
       )}
-      <span className="font-medium text-base" style={{ color: '#4a2c17' }}>{title}</span>
-      <div className="flex-1" />
+      <span className="font-bold text-base flex-1" style={{ color: '#191F28' }}>{title}</span>
       {right}
     </div>
   );
@@ -23,8 +14,8 @@ export function Header({ title, onBack, right }) {
 export function Toast({ msg }) {
   if (!msg) return null;
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm z-50 pointer-events-none"
-      style={{ background: '#4a2c17', boxShadow: '0 8px 32px rgba(74,44,23,0.25)' }}>
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl text-white text-sm z-[100] pointer-events-none whitespace-nowrap"
+      style={{ background: 'rgba(25,31,40,0.9)', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
       {msg}
     </div>
   );
@@ -32,90 +23,57 @@ export function Toast({ msg }) {
 
 export function Btn({ children, onClick, variant = 'primary', className = '', disabled, type = 'button' }) {
   const styles = {
-    primary: 'text-white font-medium',
-    outline: 'font-medium border',
-    danger: 'text-white font-medium',
-    success: 'text-white font-medium',
-  };
-  const bgs = {
-    primary: { background: 'linear-gradient(135deg, #7b4f2e 0%, #a0704a 100%)', boxShadow: '0 4px 12px rgba(123,79,46,0.3)' },
-    outline: { border: '1.5px solid #c9956a', color: '#7b4f2e', background: 'transparent' },
-    danger: { background: '#c45f5f' },
-    success: { background: '#6a9e6a' },
+    primary:  { background: '#3182F6', color: '#fff' },
+    secondary:{ background: '#F2F4F6', color: '#191F28' },
+    outline:  { background: '#fff', color: '#3182F6', border: '1.5px solid #3182F6' },
+    danger:   { background: '#F04452', color: '#fff' },
+    success:  { background: '#00C853', color: '#fff' },
   };
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${styles[variant]} ${className}`}
-      style={bgs[variant]}>
+    <button type={type} onClick={onClick} disabled={disabled}
+      className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl text-sm font-bold transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+      style={styles[variant]}>
       {children}
     </button>
   );
 }
 
-export function Input({ label, ...props }) {
+export function Card({ children, className = '', onClick }) {
   return (
-    <div className="mb-4">
-      {label && <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b4226' }}>{label}</label>}
-      <input
-        {...props}
-        className="w-full px-4 py-3 rounded-xl border outline-none text-sm transition-all"
-        style={{ background: '#fffdf9', border: '1.5px solid #e8d5b7', color: '#2d1a0e', fontFamily: 'inherit' }}
-        onFocus={e => e.target.style.borderColor = '#c9956a'}
-        onBlur={e => e.target.style.borderColor = '#e8d5b7'}
-      />
-    </div>
-  );
-}
-
-export function Select({ label, children, ...props }) {
-  return (
-    <div className="mb-4">
-      {label && <label className="block text-sm font-medium mb-1.5" style={{ color: '#6b4226' }}>{label}</label>}
-      <select
-        {...props}
-        className="w-full px-4 py-3 rounded-xl border outline-none text-sm"
-        style={{ background: '#fffdf9', border: '1.5px solid #e8d5b7', color: '#2d1a0e', fontFamily: 'inherit' }}>
-        {children}
-      </select>
-    </div>
-  );
-}
-
-export function Card({ children, className = '' }) {
-  return (
-    <div className={`rounded-2xl p-5 ${className}`}
-      style={{ background: '#fffdf9', boxShadow: '0 4px 20px rgba(74,44,23,0.1)', border: '1px solid rgba(201,149,106,0.15)' }}>
+    <div onClick={onClick}
+      className={`rounded-2xl p-5 ${className} ${onClick ? 'cursor-pointer active:scale-[0.98] transition-all' : ''}`}
+      style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
       {children}
     </div>
   );
 }
 
 export function Avatar({ src, name, size = 'md' }) {
-  const sizes = { sm: 'w-10 h-10 text-lg', md: 'w-14 h-14 text-2xl', lg: 'w-24 h-24 text-4xl', xl: 'w-32 h-32 text-5xl' };
-  const fullSrc = src
-    ? (src.startsWith('http') ? src : `${import.meta.env.VITE_API_URL || ''}${src}`)
-    : null;
-  if (fullSrc) return <img src={fullSrc} alt={name} className={`${sizes[size]} rounded-full object-cover border-2`} style={{ borderColor: '#e8d5b7' }} />;
+  const sizes = { sm: 'w-9 h-9 text-base', md: 'w-12 h-12 text-xl', lg: 'w-20 h-20 text-3xl', xl: 'w-28 h-28 text-4xl' };
+  const fullSrc = src ? (src.startsWith('http') ? src : `${import.meta.env.VITE_API_URL || ''}${src}`) : null;
+  if (fullSrc) return (
+    <img src={fullSrc} alt={name}
+      className={`${sizes[size]} rounded-full object-cover`}
+      style={{ border: '2px solid #E5E8EB' }} />
+  );
   return (
-    <div className={`${sizes[size]} rounded-full flex items-center justify-center`}
-      style={{ background: 'linear-gradient(135deg, #e8d5b7 0%, #f2e4cc 100%)', color: '#c9956a' }}>
+    <div className={`${sizes[size]} rounded-full flex items-center justify-center font-bold`}
+      style={{ background: '#E8F0FF', color: '#3182F6' }}>
       {name?.[0] || '?'}
     </div>
   );
 }
 
-export function Tag({ children, color = 'brown' }) {
+export function Tag({ children, color = 'blue' }) {
   const colors = {
-    brown: { background: '#f2e4cc', color: '#7b4f2e' },
-    green: { background: '#e8f4e8', color: '#4a7a4a' },
-    red: { background: '#fce8e8', color: '#9a3f3f' },
-    blue: { background: '#e8eef8', color: '#3a5a8a' },
+    blue:  { background: '#EBF3FF', color: '#3182F6' },
+    green: { background: '#E6FAF0', color: '#00C853' },
+    red:   { background: '#FFF0F0', color: '#F04452' },
+    gray:  { background: '#F2F4F6', color: '#8B95A1' },
+    brown: { background: '#FFF3E0', color: '#E65100' },
   };
   return (
-    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium" style={colors[color]}>
+    <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold" style={colors[color] || colors.gray}>
       {children}
     </span>
   );
@@ -124,7 +82,28 @@ export function Tag({ children, color = 'brown' }) {
 export function Spinner() {
   return (
     <div className="flex justify-center items-center py-16">
-      <div className="w-8 h-8 rounded-full border-4 animate-spin" style={{ borderColor: '#e8d5b7', borderTopColor: '#7b4f2e' }} />
+      <div className="w-7 h-7 rounded-full border-[3px] animate-spin"
+        style={{ borderColor: '#E5E8EB', borderTopColor: '#3182F6' }} />
     </div>
+  );
+}
+
+export function BottomNav({ active, navigate }) {
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t"
+      style={{ background: '#FFFFFF', borderColor: '#F2F4F6', maxWidth: 430, margin: '0 auto', left: '50%', transform: 'translateX(-50%)', width: '100%' }}>
+      {[
+        { icon: '🏠', label: '홈', path: '/home' },
+        { icon: '☕', label: '이벤트', path: '/events' },
+        { icon: '👤', label: '마이', path: '/my' },
+      ].map(n => (
+        <button key={n.label} onClick={() => navigate(n.path)}
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-semibold transition-all"
+          style={{ color: active === n.label ? '#3182F6' : '#8B95A1' }}>
+          <span className="text-xl">{n.icon}</span>
+          <span>{n.label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }
