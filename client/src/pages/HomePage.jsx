@@ -11,8 +11,18 @@ export default function HomePage() {
   const [openCount, setOpenCount] = useState(0);
 
   useEffect(() => {
-    api.get('/events/notifications/list').then(({ data }) => setUnread(data.filter(n => !n.is_read).length)).catch(() => {});
-    api.get('/events').then(({ data }) => setOpenCount(data.filter(e => e.status === 'open').length)).catch(() => {});
+    api.get('/events/notifications/list')
+      .then(({ data }) => setUnread(data.filter(n => !n.is_read).length))
+      .catch(() => {});
+
+    Promise.all([
+      api.get('/events'),
+      api.get('/events/my/applications'),
+    ]).then(([evRes, appRes]) => {
+      const appliedIds = new Set(appRes.data.map(a => a.event_id));
+      const count = evRes.data.filter(e => e.status === 'open' && !appliedIds.has(e.id)).length;
+      setOpenCount(count);
+    }).catch(() => {});
   }, []);
 
   return (
