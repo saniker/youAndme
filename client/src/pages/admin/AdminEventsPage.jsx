@@ -19,6 +19,7 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [toast, setToast] = useState('');
   const [form, setForm] = useState({
     title: '', region: '', cafeName: '', cafeAddress: '',
@@ -41,6 +42,8 @@ export default function AdminEventsPage() {
   async function createEvent() {
     if (!form.title || !form.region || !form.cafeName || !form.date)
       return showToast('필수 항목을 모두 입력해주세요.');
+    if (creating) return;
+    setCreating(true);
     try {
       await api.post('/admin/events', form);
       showToast('✅ 이벤트가 생성됐습니다!');
@@ -48,6 +51,7 @@ export default function AdminEventsPage() {
       setForm({ title:'', region:'', cafeName:'', cafeAddress:'', date:'', time:'18:00', capacityM:10, capacityF:10, description:'' });
       fetchEvents();
     } catch { showToast('생성 실패'); }
+    finally { setCreating(false); }
   }
 
   const inp = {
@@ -167,9 +171,11 @@ export default function AdminEventsPage() {
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 py-3.5 rounded-2xl text-sm font-bold"
                 style={{ background: '#F2F4F6', color: '#8B95A1' }}>취소</button>
-              <button onClick={createEvent}
-                className="flex-1 py-3.5 rounded-2xl text-sm font-bold text-white"
-                style={{ background: '#3182F6' }}>생성</button>
+              <button onClick={createEvent} disabled={creating}
+                className="flex-1 py-3.5 rounded-2xl text-sm font-bold text-white disabled:opacity-40"
+                style={{ background: '#3182F6' }}>
+                {creating ? '생성 중...' : '생성'}
+              </button>
             </div>
           </div>
         </div>
