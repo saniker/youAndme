@@ -17,8 +17,8 @@ export function AdminNav({ active }) {
       {items.map(item => (
         <button key={item.key}
           onClick={item.action || (() => navigate(item.path))}
-          className="flex-1 flex flex-col items-center py-3 gap-0.5 relative"
-          style={{ color: active === item.key ? '#3182F6' : '#8B95A1' }}>
+          className="flex-1 flex flex-col items-center gap-0.5 relative"
+          style={{ color: active === item.key ? '#3182F6' : '#8B95A1', minHeight: 56 }}>
           <span className="text-xl">{item.icon}</span>
           <span className="text-xs font-semibold">{item.label}</span>
           {active === item.key && (

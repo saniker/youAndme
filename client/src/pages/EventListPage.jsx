@@ -64,10 +64,11 @@ export default function EventListPage() {
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {REGIONS.map(r => (
             <button key={r} onClick={() => setRegion(r)}
-              className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+              className="flex-shrink-0 px-4 rounded-full text-xs font-bold transition-all"
               style={{
                 background: region === r ? '#3182F6' : '#F2F4F6',
                 color: region === r ? '#FFFFFF' : '#8B95A1',
+                minHeight: 44,
               }}>
               {r}
             </button>

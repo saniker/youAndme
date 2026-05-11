@@ -177,11 +177,12 @@ export default function AdminEventDetailPage() {
         <div className="flex gap-2 overflow-x-auto pb-1">
           {[['pending','대기'],['confirmed','확정'],['rejected','거절'],['all','전체']].map(([v, l]) => (
             <button key={v} onClick={() => setTab(v)}
-              className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all"
+              className="flex-shrink-0 px-4 rounded-full text-xs font-bold transition-all"
               style={{
                 background: tab === v ? '#191F28' : '#FFFFFF',
                 color: tab === v ? 'white' : '#4A4F5C',
-                border: `1px solid ${tab === v ? '#191F28' : '#E5E8EB'}`
+                border: `1px solid ${tab === v ? '#191F28' : '#E5E8EB'}`,
+                minHeight: 44,
               }}>
               {l} {v !== 'all' ? apps.filter(a => a.app_status === v).length : apps.length}
             </button>

@@ -31,3 +31,12 @@ body {
 /* 모바일 브라우저 주소창 대응: 100vh → 100dvh */
 .min-h-screen { min-height: 100dvh !important; }
 .h-screen { height: 100dvh !important; }
+
+/* 모바일 터치 최소 영역 44px 보장 */
+button {
+  min-height: 44px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

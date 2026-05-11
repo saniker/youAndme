@@ -95,10 +95,11 @@ export default function AdminUsersPage() {
               { v: 'rejected', l: '거절',     color: '#F04452', bg: '#FFF0F0' },
             ].map(({ v, l, color, bg }) => (
               <button key={v} onClick={() => setApprovalTab(v)}
-                className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
+                className="flex-1 rounded-xl text-xs font-bold transition-all"
                 style={{
                   background: approvalTab === v ? color : bg,
                   color: approvalTab === v ? 'white' : color,
+                  minHeight: 48,
                 }}>
                 {l} {users.filter(u => u.status === v).length}
               </button>
@@ -136,11 +137,12 @@ export default function AdminUsersPage() {
               { v: 'F',   l: `👩 여성 ${femaleCount}명` },
             ].map(({ v, l }) => (
               <button key={v} onClick={() => setGenderTab(v)}
-                className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
+                className="flex-1 rounded-xl text-xs font-bold transition-all"
                 style={{
                   background: genderTab === v ? '#191F28' : '#FFFFFF',
                   color: genderTab === v ? 'white' : '#4A4F5C',
                   border: `1px solid ${genderTab === v ? '#191F28' : '#E5E8EB'}`,
+                  minHeight: 48,
                 }}>
                 {l}
               </button>

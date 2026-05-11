@@ -37,8 +37,8 @@ export default function MyPage() {
       <div className="px-5 py-4 flex items-center justify-between" style={{ background: '#FFFFFF' }}>
         <p className="text-xl font-black" style={{ color: '#191F28' }}>마이</p>
         <button onClick={() => { logout(); navigate('/'); }}
-          className="text-xs font-bold px-3 py-1.5 rounded-xl"
-          style={{ background: '#F2F4F6', color: '#8B95A1' }}>로그아웃</button>
+          className="text-xs font-bold px-4 rounded-xl"
+          style={{ background: '#F2F4F6', color: '#8B95A1', minHeight: 44 }}>로그아웃</button>
       </div>
 
       <div className="px-4 pt-4 space-y-3">

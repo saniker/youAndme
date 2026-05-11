@@ -98,9 +98,9 @@ export function BottomNav({ active, navigate }) {
         { icon: '👤', label: '마이', path: '/my' },
       ].map(n => (
         <button key={n.label} onClick={() => navigate(n.path)}
-          className="flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-semibold transition-all"
-          style={{ color: active === n.label ? '#3182F6' : '#8B95A1' }}>
-          <span className="text-xl">{n.icon}</span>
+          className="flex-1 flex flex-col items-center justify-center gap-1 text-xs font-semibold transition-all"
+          style={{ color: active === n.label ? '#3182F6' : '#8B95A1', minHeight: 56, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <span className="text-2xl">{n.icon}</span>
           <span>{n.label}</span>
         </button>
       ))}
