@@ -60,51 +60,51 @@ export default function RegisterPage() {
   }
 
   const inp = {
-    width: '100%', padding: '14px 16px', borderRadius: 12, border: 'none',
+    width: '100%', padding: '11px 14px', borderRadius: 10, border: 'none',
     background: '#F2F4F6', color: '#191F28', fontFamily: 'inherit', fontSize: 14, outline: 'none'
   };
 
   return (
     <div className="min-h-screen" style={{ background: '#F2F4F6' }}>
       {/* 헤더 */}
-      <div className="sticky top-0 z-50 px-5 py-4 flex items-center gap-3"
+      <div className="sticky top-0 z-50 px-5 py-3.5 flex items-center gap-3"
         style={{ background: '#FFFFFF', borderBottom: '1px solid #F2F4F6' }}>
         <button onClick={() => navigate('/')} style={{ color: '#191F28', fontSize: 22 }}>←</button>
         <span className="font-black text-lg" style={{ color: '#191F28' }}>회원가입</span>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-4 py-4 pb-24 space-y-3">
-        {/* 프로필 사진 */}
-        <div className="flex flex-col items-center py-4">
-          <label className="cursor-pointer relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center"
-              style={{ background: '#EBF3FF', border: '3px solid #3182F6' }}>
-              {photoPreview
-                ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
-                : <span className="text-3xl">📷</span>}
-            </div>
-            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-white text-sm"
-              style={{ background: '#3182F6' }}>+</div>
-            <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-          </label>
-          <p className="text-xs mt-2 font-medium" style={{ color: '#8B95A1' }}>프로필 사진 (선택)</p>
-        </div>
+      <form onSubmit={handleSubmit} className="px-4 py-3 pb-8 space-y-2">
 
         {/* 기본 정보 */}
-        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <p className="text-sm font-black mb-4" style={{ color: '#191F28' }}>기본 정보</p>
+        <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <p className="text-sm font-black mb-3" style={{ color: '#191F28' }}>기본 정보</p>
 
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>이름 *</label>
-            <input style={inp} placeholder="이름을 입력하세요" value={form.name} onChange={e => set('name', e.target.value)} />
+          {/* 사진 + 이름 한 줄 */}
+          <div className="flex items-center gap-3 mb-3">
+            <label className="cursor-pointer relative flex-shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center"
+                style={{ background: '#EBF3FF', border: '2px solid #3182F6' }}>
+                {photoPreview
+                  ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
+                  : <span className="text-2xl">📷</span>}
+              </div>
+              <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs"
+                style={{ background: '#3182F6' }}>+</div>
+              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            </label>
+            <div className="flex-1">
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>이름 *</label>
+              <input style={inp} placeholder="이름을 입력하세요" value={form.name} onChange={e => set('name', e.target.value)} />
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>성별 *</label>
+          {/* 성별 */}
+          <div className="mb-3">
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>성별 *</label>
             <div className="grid grid-cols-2 gap-2">
               {[['M', '👨 남성'], ['F', '👩 여성']].map(([v, l]) => (
                 <button key={v} type="button" onClick={() => set('gender', v)}
-                  className="py-3 rounded-2xl text-sm font-bold transition-all"
+                  className="py-2.5 rounded-xl text-sm font-bold transition-all"
                   style={{
                     background: form.gender === v ? '#3182F6' : '#F2F4F6',
                     color: form.gender === v ? '#FFFFFF' : '#8B95A1',
@@ -115,40 +115,42 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* 나이 / 직업 */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>나이 *</label>
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>나이 *</label>
               <input style={inp} type="number" placeholder="나이" min={18} max={50}
                 value={form.age} onChange={e => set('age', e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>직업</label>
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>직업</label>
               <input style={inp} placeholder="직업" value={form.job} onChange={e => set('job', e.target.value)} />
             </div>
           </div>
 
+          {/* 자기소개 */}
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>자기소개</label>
-            <textarea style={{ ...inp, minHeight: 80, resize: 'none' }}
-              placeholder="간단한 자기소개를 작성해주세요 ☕"
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>자기소개</label>
+            <textarea style={{ ...inp, minHeight: 60, resize: 'none' }}
+              placeholder="간단한 자기소개 ☕"
               value={form.intro} onChange={e => set('intro', e.target.value)} />
           </div>
         </div>
 
         {/* 계정 정보 */}
-        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <p className="text-sm font-black mb-4" style={{ color: '#191F28' }}>계정 정보</p>
+        <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          <p className="text-sm font-black mb-3" style={{ color: '#191F28' }}>계정 정보</p>
 
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>이메일 *</label>
+          <div className="mb-3">
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>이메일 *</label>
             <input style={inp} type="email" placeholder="이메일 주소" value={form.email} onChange={e => set('email', e.target.value)} />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>비밀번호 *</label>
+          <div className="mb-3">
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>비밀번호 *</label>
             <input style={inp} type="password" placeholder="6자 이상" value={form.password} onChange={e => set('password', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: '#191F28' }}>비밀번호 확인 *</label>
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#191F28' }}>비밀번호 확인 *</label>
             <input style={inp} type="password" placeholder="비밀번호 재입력" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} />
           </div>
         </div>
@@ -159,7 +161,7 @@ export default function RegisterPage() {
           {loading ? '가입 중...' : '✨ 가입 신청하기'}
         </button>
 
-        <p className="text-center text-sm" style={{ color: '#8B95A1' }}>
+        <p className="text-center text-sm pb-2" style={{ color: '#8B95A1' }}>
           이미 계정이 있으신가요?{' '}
           <button type="button" onClick={() => navigate('/login')} className="font-bold" style={{ color: '#3182F6' }}>
             로그인
