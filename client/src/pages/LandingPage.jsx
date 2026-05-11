@@ -11,7 +11,7 @@ export default function LandingPage() {
   }, [user, navigate]);
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: '#FFFFFF' }}>
+    <div className="flex flex-col" style={{ background: '#FFFFFF', height: '100dvh' }}>
       {/* 상단 영역 */}
       <div className="flex-1 flex flex-col justify-center px-6">
         {/* 로고 */}
