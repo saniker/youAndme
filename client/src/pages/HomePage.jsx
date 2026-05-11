@@ -20,13 +20,13 @@ export default function HomePage() {
       {/* 헤더 */}
       <div className="px-5 pt-6 pb-5" style={{ background: '#FFFFFF' }}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <button className="flex items-center gap-3" onClick={() => navigate('/my')}>
             <Avatar src={user?.photo} name={user?.name} size="md" />
             <div>
               <p className="text-xs font-medium" style={{ color: '#8B95A1' }}>안녕하세요 👋</p>
               <p className="text-lg font-black" style={{ color: '#191F28' }}>{user?.name}님</p>
             </div>
-          </div>
+          </button>
           <button onClick={() => navigate('/notifications')} className="relative p-2">
             <span className="text-2xl">🔔</span>
             {unread > 0 && (
