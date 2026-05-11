@@ -10,6 +10,11 @@ const STATUS_MAP = {
   closed:   { label: '신청 마감', color: '#8B95A1', bg: '#F2F4F6' },
   finished: { label: '행사 종료', color: '#8B95A1', bg: '#F2F4F6' },
 };
+const APP_MAP = {
+  pending:   { label: '검토 중', color: '#3182F6', bg: '#EBF3FF' },
+  confirmed: { label: '✅ 참가 확정', color: '#00C853', bg: '#E6FAF0' },
+  rejected:  { label: '미선정', color: '#F04452', bg: '#FFF0F0' },
+};
 
 export default function EventListPage() {
   const navigate = useNavigate();
@@ -89,6 +94,7 @@ export default function EventListPage() {
 
 function EventCard({ event: ev, onClick }) {
   const st = STATUS_MAP[ev.status] || STATUS_MAP.open;
+  const appSt = ev.myApplication ? APP_MAP[ev.myApplication.status] : null;
   const mFull = ev.confirmed_m >= ev.capacity_m;
   const fFull = ev.confirmed_f >= ev.capacity_f;
 
@@ -109,9 +115,15 @@ function EventCard({ event: ev, onClick }) {
           <span className="text-xs px-2.5 py-1 rounded-full font-bold"
             style={{ background: 'rgba(255,255,255,0.92)', color: '#8B95A1' }}>📍 {ev.region}</span>
         </div>
-        <div className="absolute top-3 right-3">
-          <span className="text-xs px-2.5 py-1 rounded-full font-bold"
-            style={{ background: st.bg, color: st.color }}>{st.label}</span>
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+          {appSt && (
+            <span className="text-xs px-2.5 py-1 rounded-full font-bold"
+              style={{ background: appSt.bg, color: appSt.color }}>{appSt.label}</span>
+          )}
+          {!appSt && (
+            <span className="text-xs px-2.5 py-1 rounded-full font-bold"
+              style={{ background: st.bg, color: st.color }}>{st.label}</span>
+          )}
         </div>
       </div>
 

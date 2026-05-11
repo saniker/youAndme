@@ -16,16 +16,18 @@ router.get('/', requireAuth, async (req, res) => {
 
     const { data: apps } = await supabase
       .from('applications')
-      .select('event_id, status, users(gender)')
+      .select('event_id, status, user_id, users(gender)')
       .in('event_id', events.map(e => e.id));
 
     const enriched = events.map(ev => {
       const evApps = (apps || []).filter(a => a.event_id === ev.id);
+      const myApp = evApps.find(a => a.user_id === req.user.id);
       return {
         ...ev,
         confirmed_m: evApps.filter(a => a.status === 'confirmed' && a.users?.gender === 'M').length,
         confirmed_f: evApps.filter(a => a.status === 'confirmed' && a.users?.gender === 'F').length,
         pending_count: evApps.filter(a => a.status === 'pending').length,
+        myApplication: myApp ? { status: myApp.status } : null,
       };
     });
     res.json(enriched);
