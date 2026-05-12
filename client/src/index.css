@@ -36,7 +36,4 @@ body {
 button {
   min-height: 44px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
