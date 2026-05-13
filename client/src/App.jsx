@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useCallback } from 'react';
 import { useAuthStore } from './store';
 
 import LandingPage from './pages/LandingPage';
@@ -19,6 +20,40 @@ import AdminEventDetailPage from './pages/admin/AdminEventDetailPage';
 import AdminResultsPage from './pages/admin/AdminResultsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 
+// ── 세션 타임아웃 ──────────────────────────────────────────
+// 마지막 활동으로부터 IDLE_MS 경과 시 자동 로그아웃
+const IDLE_MS = 60 * 1000; // 1분 (변경 시 이 값만 수정)
+
+function IdleTimer() {
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const timer = useRef(null);
+
+  const reset = useCallback(() => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      logout();
+      navigate('/', { replace: true });
+    }, IDLE_MS);
+  }, [logout, navigate]);
+
+  useEffect(() => {
+    if (!user || user.isAdmin) return; // 미로그인·어드민은 제외
+
+    const events = ['click', 'keydown', 'touchstart', 'mousemove', 'scroll'];
+    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    reset(); // 최초 타이머 시작
+
+    return () => {
+      clearTimeout(timer.current);
+      events.forEach(e => window.removeEventListener(e, reset));
+    };
+  }, [user, reset]);
+
+  return null;
+}
+// ──────────────────────────────────────────────────────────
+
 function RequireAuth({ children }) {
   const { user } = useAuthStore();
   if (!user) return <Navigate to="/" replace />;
@@ -35,6 +70,7 @@ function RequireAdmin({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <IdleTimer />
       <Routes>
         {/* 공통 */}
         <Route path="/" element={<LandingPage />} />
